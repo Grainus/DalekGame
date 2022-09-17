@@ -1,53 +1,73 @@
+# For type hinting
+from __future__ import annotations 
+from typing import List
+
+# Enums used in events
 from game_engine import Direction, Ability
 
+# Debugging
+import logging
+
 class Event(object):
-    """Base class for events"""
-    pass
+    """Base class for events."""
+    def __str__(self):
+        return f"{self.__class__.__name__}{self.__dict__}"
 
 
 class ExitEvent(Event):
-    """Sent when the game ends
+    """Sent when the game ends.
     
     Possible codes include:
 
-         0 for a normal Game Over.
-         1 for an exit command during a game.
-        -1 for a critical error.
+        - 0 for a normal Game Over
+        - 1 for an exit command during a game.
+        - -1 for a critical error.
     """
     def __init__(self, exitcode: int = 0):
         self.code = exitcode
 
 
 class BeginEvent(Event):
-    """Sent when a game starts"""
+    """Sent when a game starts."""
     pass
 
 
 class PlayerMoveEvent(Event):
-    """Sent when a player needs to move"""
+    """Sent when a player needs to move."""
     def __init__(self, dir: Direction):
         self.dir = dir
 
 
-class PlayerAbilityEvent(Event):
-    """Sent when a player uses an ability or tool"""
-    def __init__(self, ability: Ability):
-        self.type = ability
-
-
-class UpdateEvent(Event):
-    """Sent when the display needs to be updated"""
+class TickEvent(Event):
+    """Sent every game tick."""
     pass
+
+
+class PlayerAbilityEvent(Event):
+    """Sent when a player uses an ability or tool."""
+    def __init__(self, ability: Ability):
+        self.ability = ability
+
+
+class DrawEvent(Event):
+    """Sent when the display needs to be updated.
+
+    This allows the game to not draw on every frame \
+    if nothing is changing.
+    """
+    pass
+
 
 
 class EventManager:
     """Communicates events between parts of the application."""
     def __init__(self):
-        self.listeners = []
+        self.listeners: List[EventListener] = []
     
-    def register(self, component) -> None:
+    def register(self, component: EventListener) -> None:
         """Register a new listener that will receive events.
-        The component needs to support a notify method."""
+        The component needs to support a notify method.
+        """
         if hasattr(component, 'notify') \
                 and callable(component.notify):
             self.listeners.append(component)
@@ -59,3 +79,14 @@ class EventManager:
         """Broadcast an event to all listeners."""
         for listener in self.listeners:
             listener.notify(event)
+
+
+class EventListener:
+    """Base class for classes that listen to or broadcast events."""
+    def __init__(self, eventmanager: EventManager):
+        self.eventman = eventmanager # Allows posting
+        eventmanager.register(self)  # Allows to be notified
+
+    def notify(self, event: Event) -> None:
+        """Callback when an event is posted."""
+        logging.debug(f"{event} received from {type(self)}")
