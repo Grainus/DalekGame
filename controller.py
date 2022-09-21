@@ -1,11 +1,13 @@
+# Typing
+from typing import NoReturn
+
 # All required events
-from eventmanager import EventManager, EventListener, \
-    Event, TickEvent, PlayerMoveEvent, PlayerAbilityEvent
+from eventmanager import EventManager, EventListener, Event, \
+    BeginEvent, TickEvent, PlayerMoveEvent, PlayerAbilityEvent
 
 # Placeholder imports
 from game import Game
-from models import Doctor
-from game_engine import Direction, Ability
+from models import Doctor, Direction, Ability
 
 # Input
 from msvcrt import getch
@@ -18,15 +20,20 @@ class Keyboard(EventListener):
         super().__init__(eventmanager)
         self.event_queue: SimpleQueue = SimpleQueue()
         self.game = game
+        self.threaded = True
+        self.daemon = True
         
     def notify(self, event: Event) -> None:
-        if isinstance(event, TickEvent):
+        super().notify(event)
+        if isinstance(event, BeginEvent):
+            self.run()
+        elif isinstance(event, TickEvent):
             # Check if it's currently the player's turn
             if self.game.turn.current() == Doctor:
                 if not self.event_queue.empty():
                     self.eventman.post(self.event_queue.get())
 
-    def run(self):
+    def run(self) -> NoReturn:
         directions = {
             72: Direction.UP,
             73: Direction.UPRIGHT,
@@ -42,16 +49,20 @@ class Keyboard(EventListener):
             'z': Ability.TELEPORT,
             'x': Ability.ZAP
         }
+        event: PlayerMoveEvent | PlayerAbilityEvent
 
         while True:
             _input = getch()
             if ord(_input) == 0:
-                _input = ord(getch())
-                if _input in directions:
-                    event = PlayerMoveEvent(directions[_input])
+                _inputval = ord(getch())
+                if _inputval in directions:
+                    event = PlayerMoveEvent(directions[_inputval])
                     self.event_queue.put(event)
             else:
-                _input = _input.decode().lower()
-                if _input in abilities.keys():
-                    event = PlayerAbilityEvent(abilities[_input])
-                    self.event_queue.put(event)
+                try:
+                    _inputstr = _input.decode().lower()
+                    if _inputstr in abilities.keys():
+                        event = PlayerAbilityEvent(abilities[_inputstr])
+                        self.event_queue.put(event)
+                except Exception as e:
+                    print(e)

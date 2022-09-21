@@ -3,7 +3,10 @@ from __future__ import annotations
 from typing import List
 
 # Enums used in events
-from game_engine import Direction, Ability
+from models import Direction, Ability
+
+# Thread management
+from threading import Thread
 
 # Debugging
 import logging
@@ -60,7 +63,9 @@ class DrawEvent(Event):
 
 
 class EventManager:
-    """Communicates events between parts of the application."""
+    """Communicates events between parts of the application.
+    Also manages threads.
+    """
     def __init__(self):
         self.listeners: List[EventListener] = []
     
@@ -77,8 +82,17 @@ class EventManager:
         
     def post(self, event: Event) -> None:
         """Broadcast an event to all listeners."""
+        begin = isinstance(event, BeginEvent)
         for listener in self.listeners:
-            listener.notify(event)
+            if begin and listener.threaded:
+                # Begin components in a new thread
+                Thread(
+                    target=listener.notify,
+                    daemon=listener.daemon,
+                    args=(event,)
+                ).start()
+            else:
+                listener.notify(event)
 
 
 class EventListener:
@@ -86,7 +100,10 @@ class EventListener:
     def __init__(self, eventmanager: EventManager):
         self.eventman = eventmanager # Allows posting
         eventmanager.register(self)  # Allows to be notified
+        self.threaded = False        # By default, run in main thread
+        self.daemon = False
 
     def notify(self, event: Event) -> None:
         """Callback when an event is posted."""
-        logging.debug(f"{event} received from {type(self)}")
+        if not isinstance(event, TickEvent):
+            logging.debug(f"{event} received from {type(self)}")
