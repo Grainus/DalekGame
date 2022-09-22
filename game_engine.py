@@ -3,7 +3,7 @@ import logging
 
 # Events required
 from eventmanager import EventManager, EventListener, Event, \
-    ExitEvent, BeginEvent, TickEvent
+    BeginEvent, ExitEvent, TickEvent
 
 
 class GameEngine(EventListener):
@@ -21,6 +21,6 @@ class GameEngine(EventListener):
         """Starts the main game loop."""
         self.running = True
         self.eventman.post(BeginEvent())
-        logging.debug("Starting")
+        logging.info("Starting")
         while self.running:
             self.eventman.post(TickEvent())

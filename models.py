@@ -25,6 +25,7 @@ class Direction(Enum):
     DOWNLEFT = 5
     LEFT = 6
     UPLEFT = 7
+    NONE = -1
 
 
 class Ability(Enum):

@@ -16,6 +16,10 @@ class Event(object):
         return f"{self.__class__.__name__}{self.__dict__}"
 
 
+class BeginEvent(Event):
+    """Sent when a game starts."""
+
+
 class ExitEvent(Event):
     """Sent when the game ends.
     
@@ -29,18 +33,14 @@ class ExitEvent(Event):
         self.code = exitcode
 
 
-class BeginEvent(Event):
-    """Sent when a game starts."""
+class TickEvent(Event):
+    """Sent every game tick."""
 
 
 class PlayerMoveEvent(Event):
     """Sent when a player needs to move."""
     def __init__(self, dir: Direction):
         self.dir = dir
-
-
-class TickEvent(Event):
-    """Sent every game tick."""
 
 
 class PlayerAbilityEvent(Event):

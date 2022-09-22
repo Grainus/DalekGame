@@ -1,9 +1,18 @@
+"""Handles input for the program.
+
+These classes should be run in a separate thread if they are blocking.
+
+Todo:
+    * Get input from joysticks
+"""
+
 # Typing
-from typing import NoReturn
+from typing import Dict, NoReturn
 
 # Input
 from msvcrt import getch
 from queue import SimpleQueue
+import logging
 
 # Required events
 from eventmanager import EventManager, EventListener, Event, \
@@ -37,15 +46,16 @@ class Keyboard(EventListener):
         """Run the input loop forever.
         Inputs are recorded constantly but sent at most once per tick.
         """
-        directions = {
-            72: Direction.UP,
-            73: Direction.UPRIGHT,
-            77: Direction.RIGHT,
-            81: Direction.DOWNRIGHT,
-            80: Direction.DOWN,
-            79: Direction.DOWNLEFT,
-            75: Direction.LEFT,
-            71: Direction.UPLEFT
+        directions: Dict[int | str, Direction] = {
+            **dict.fromkeys([72, '8'], Direction.UP),
+            **dict.fromkeys([73, '9'], Direction.UPRIGHT),
+            **dict.fromkeys([77, '6'], Direction.RIGHT),
+            **dict.fromkeys([81, '3'], Direction.DOWNRIGHT),
+            **dict.fromkeys([80, '2'], Direction.DOWN),
+            **dict.fromkeys([79, '1'], Direction.DOWNLEFT),
+            **dict.fromkeys([75, '4'], Direction.LEFT),
+            **dict.fromkeys([71, '7'], Direction.UPLEFT),
+            **dict.fromkeys(['\r', '5'], Direction.NONE)
         }
 
         abilities = {
@@ -55,7 +65,8 @@ class Keyboard(EventListener):
 
         while True:
             _input = getch()
-            if ord(_input) == 0:
+            logging.debug(_input)
+            if ord(_input) == 0: # Arrow keys
                 _inputval = ord(getch())
                 if _inputval in directions:
                     self.event_queue.put(
@@ -66,4 +77,8 @@ class Keyboard(EventListener):
                 if _inputstr in abilities:
                     self.event_queue.put(
                         PlayerAbilityEvent(abilities[_inputstr])
+                    )
+                elif _inputstr in directions:
+                    self.event_queue.put(
+                        PlayerMoveEvent(directions[_inputstr])
                     )
