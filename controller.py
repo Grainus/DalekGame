@@ -12,7 +12,6 @@ from typing import Dict, NoReturn
 # Input
 from msvcrt import getch
 from queue import SimpleQueue
-import logging
 
 # Required events
 from eventmanager import EventManager, EventListener, Event, \
@@ -64,21 +63,18 @@ class Keyboard(EventListener):
         }
 
         while True:
-            _input = getch()
-            logging.debug(_input)
-            if ord(_input) == 0: # Arrow keys
-                _inputval = ord(getch())
-                if _inputval in directions:
-                    self.event_queue.put(
-                        PlayerMoveEvent(directions[_inputval])
-                    )
+            _inputbyte = getch()
+            _input: int | str
+            if ord(_inputbyte) == 0: # Arrow keys
+                _input = ord(getch())
             else:
-                _inputstr = _input.decode().lower()
-                if _inputstr in abilities:
-                    self.event_queue.put(
-                        PlayerAbilityEvent(abilities[_inputstr])
-                    )
-                elif _inputstr in directions:
-                    self.event_queue.put(
-                        PlayerMoveEvent(directions[_inputstr])
-                    )
+                _input = _inputbyte.decode().lower()
+
+            if _input in directions:
+                self.event_queue.put(
+                    PlayerMoveEvent(directions[_input])
+                )
+            elif _input in abilities:
+                self.event_queue.put(
+                    PlayerAbilityEvent(abilities[_input]) # type: ignore
+                )
