@@ -59,11 +59,8 @@ class Keyboard(EventListener):
                         PlayerMoveEvent(directions[_inputval])
                     )
             else:
-                try:
-                    _inputstr = _input.decode().lower()
-                    if _inputstr in abilities.keys():
-                        self.event_queue.put(
-                            PlayerAbilityEvent(abilities[_inputstr])
-                        )
-                except Exception as e:
-                    print(e)
+                _inputstr = _input.decode().lower()
+                if _inputstr in abilities:
+                    self.event_queue.put(
+                        PlayerAbilityEvent(abilities[_inputstr])
+                    )
