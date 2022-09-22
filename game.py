@@ -1,4 +1,4 @@
-# Placeholder class
+"""Placeholder class to develop components that require it."""
 
 from eventmanager import EventManager, EventListener
 from models import Doctor, Dalek, Turn

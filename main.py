@@ -1,3 +1,5 @@
+"""Runs all components for debugging."""
+
 from eventmanager import *
 from controller import *
 from game_engine import *

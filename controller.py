@@ -1,7 +1,11 @@
 # Typing
 from typing import NoReturn
 
-# All required events
+# Input
+from msvcrt import getch
+from queue import SimpleQueue
+
+# Required events
 from eventmanager import EventManager, EventListener, Event, \
     BeginEvent, TickEvent, PlayerMoveEvent, PlayerAbilityEvent
 
@@ -9,13 +13,9 @@ from eventmanager import EventManager, EventListener, Event, \
 from game import Game
 from models import Doctor, Direction, Ability
 
-# Input
-from msvcrt import getch
-from queue import SimpleQueue
-
 
 class Keyboard(EventListener):
-    """Controller that handles keyboard inputs and sends events"""
+    """Controller that handles keyboard inputs and sends events."""
     def __init__(self, eventmanager: EventManager, game: Game):
         super().__init__(eventmanager)
         self.event_queue: SimpleQueue = SimpleQueue()
@@ -34,6 +34,9 @@ class Keyboard(EventListener):
                     self.eventman.post(self.event_queue.get())
 
     def run(self) -> NoReturn:
+        """Run the input loop forever.
+        Inputs are recorded constantly but sent at most once per tick.
+        """
         directions = {
             72: Direction.UP,
             73: Direction.UPRIGHT,

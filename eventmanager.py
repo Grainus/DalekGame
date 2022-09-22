@@ -1,15 +1,14 @@
-# For type hinting
+# Type hinting and debugging
 from __future__ import annotations 
 from typing import List
-
-# Enums used in events
-from models import Direction, Ability
+import logging
 
 # Thread management
 from threading import Thread
 
-# Debugging
-import logging
+# Enums used in events
+from models import Direction, Ability
+
 
 class Event(object):
     """Base class for events."""
@@ -32,7 +31,6 @@ class ExitEvent(Event):
 
 class BeginEvent(Event):
     """Sent when a game starts."""
-    pass
 
 
 class PlayerMoveEvent(Event):
@@ -43,7 +41,6 @@ class PlayerMoveEvent(Event):
 
 class TickEvent(Event):
     """Sent every game tick."""
-    pass
 
 
 class PlayerAbilityEvent(Event):
@@ -58,8 +55,6 @@ class DrawEvent(Event):
     This allows the game to not draw on every frame \
     if nothing is changing.
     """
-    pass
-
 
 
 class EventManager:

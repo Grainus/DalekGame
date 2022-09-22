@@ -1,6 +1,8 @@
-# Placeholder classes
+"""Placeholder classes to develop components that require them."""
 
-from typing import Iterable, Type
+from __future__ import annotations
+from typing import Iterable
+from collections.abc import Sequence
 from enum import Enum
 
 class NotImplementedClass:
@@ -31,18 +33,18 @@ class Ability(Enum):
 
 
 class Turn:
-    def __init__(self, turns: Iterable[Type]):
+    def __init__(self, turns: Sequence[type]):
         self.turns = turns
         self.indx = 0
   
-    def __iter__(self):
+    def __iter__(self) -> Turn:
         return self
 
-    def __next__(self):
+    def __next__(self) -> type:
         turn = self.turns[self.indx]
         self.indx += 1
         self.indx = self.indx % len(self.turns)
         return turn
 
-    def current(self):
+    def current(self) -> type:
         return self.turns[self.indx]
