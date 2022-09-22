@@ -49,20 +49,21 @@ class Keyboard(EventListener):
             'z': Ability.TELEPORT,
             'x': Ability.ZAP
         }
-        event: PlayerMoveEvent | PlayerAbilityEvent
 
         while True:
             _input = getch()
             if ord(_input) == 0:
                 _inputval = ord(getch())
                 if _inputval in directions:
-                    event = PlayerMoveEvent(directions[_inputval])
-                    self.event_queue.put(event)
+                    self.event_queue.put(
+                        PlayerMoveEvent(directions[_inputval])
+                    )
             else:
                 try:
                     _inputstr = _input.decode().lower()
                     if _inputstr in abilities.keys():
-                        event = PlayerAbilityEvent(abilities[_inputstr])
-                        self.event_queue.put(event)
+                        self.event_queue.put(
+                            PlayerAbilityEvent(abilities[_inputstr])
+                        )
                 except Exception as e:
                     print(e)
