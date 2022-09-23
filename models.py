@@ -1,7 +1,6 @@
 """Placeholder classes to develop components that require them."""
 
 from __future__ import annotations
-from typing import Iterable
 from collections.abc import Sequence
 from enum import Enum
 
