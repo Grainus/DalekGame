@@ -33,6 +33,12 @@ class Ability(Enum):
     ZAP = 1
 
 
+class Difficulty(Enum):
+    EASY = 0
+    MEDIUM = 1
+    HARD = 2
+
+
 class Turn:
     def __init__(self, turns: Sequence[type]):
         self.turns = turns
