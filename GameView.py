@@ -1,12 +1,9 @@
 from os import get_terminal_size
 
 class GameView():
-    espace_entre_cases = 2
-    largeur_case = 5
-
-    def __init__(self, row_grid = 6, columns_grid = 8):
-        self.rows_grid = row_grid #peut pas y acceder via GamGrid
-        self.columns_grid = columns_grid #peut pas y acceder via GamGrid        
+   def __init__(self, espace_entre_cases = 2, largeur_case = 5):
+        self.espace_entre_cases =  espace_entre_cases
+        self.largeur_case  = largeur_case        
 
     def afficher_header(self, difficulte, niveau, score):
         posx = get_terminal_size().columns 
