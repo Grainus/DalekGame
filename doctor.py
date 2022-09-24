@@ -8,12 +8,12 @@
 # ----------------------------------------------------------------------------------------------------------------------#
 
 class Doctor:
-	def __init__(self, zap_count):
+	def __init__(self, zap_count: int):
 		self.zap_count = zap_count
 		self.is_alive = True
 
-		def can_zap(self):
-			return bool(self.zap_count)
+		def can_zap(self) -> bool:
+			return self.zap_count > 0
 
 		def teleport(self):
-			pass
+			raise NotImplementedError
