@@ -42,9 +42,3 @@ class GameView():
     def afficher_footer(self, sorte_de_teleporteur, nb_de_zap):    
         posx = get_terminal_size().columns 
         print( ("TELEPORTEUR (z) : " + sorte_de_teleporteur).center(int(posx*1/3)) + (" ").center(int(posx*1/3))+ ("ZAP (x): "+ "["+nb_de_zap+"]").center(int(posx*1/3)))
-
-#petit test, il faut un grid pour tester afficher_les_cases(grid) mais ca marchait pour moi avec la classe GameGrid
-GameView().afficher_header("Moyen","5","300")
-GameView().afficher_footer("0","1")
-#Possibilite de clear la console a chaque mouvement
-# possibilite de resize les cases avec la taille de la console/du terminal 
