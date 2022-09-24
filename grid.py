@@ -7,6 +7,7 @@
 
 # ----------------------------------------------------------------------------------------------------------------------#
 import random
+import __main__
 
 
 class GameGrid:
@@ -96,7 +97,8 @@ def request_move(gamegrid):
 
 
 def validate_move(gamegrid, move_request):
-
+	# {'UP': [0, -1], 'UPRIGHT': [1, -1], 'UPLEFT': [-1, -1], 'DOWN': [0, 1], 'DOWNRIGHT': [1, 1], 'DOWNLEFT': [-1, 1],
+	# 'LEFT': [-1, 0], 'RIGHT': [1, 0]}
 	pos = find_doctor(gamegrid)
 	if move_request == 'UP':
 		if pos[0]:  # if the object is not at the top of the grid
