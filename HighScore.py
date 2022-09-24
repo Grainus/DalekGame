@@ -1,4 +1,6 @@
 import datetime 
+import Game
+
 class HighScore():
    liste_score = []
    def get_score(liste):
@@ -11,7 +13,10 @@ class HighScore():
       return liste['date']
    #pour que la liste aille toujours le high score en premier
    
-def push_score(nom, difficulte,score):
+def push_score():
+   difficulte = Game.Game().difficulte
+   nom = Game.Game().nom
+   score = Game.Game().score
    date = str(datetime.datetime.now().year)+"/"+str(datetime.datetime.now().month)+"/"+str(datetime.datetime.now().day)
    new_score = {'date': date, 'nom':nom, 'difficulte':difficulte,'score': score}
    HighScore().liste_score.append(new_score)
