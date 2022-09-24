@@ -1,4 +1,6 @@
 from os import get_terminal_size
+import GameGrid
+import Game
 
 class GameView():
    def __init__(self, espace_entre_cases = 2, largeur_case = 5):
