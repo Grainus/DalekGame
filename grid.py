@@ -194,5 +194,3 @@ def move_all_daleks(gameGrid):
 		#		else:
 		#			# To add : If the Dalek blocking the way hasn't move yet, move it first
 		#			move_dalek()
-
-
