@@ -42,7 +42,17 @@ class GameView():
         posx = get_terminal_size().columns 
         print( ("TELEPORTEUR (z) : " + sorte_de_teleporteur).center(int(posx*1/3)) + (" ").center(int(posx*1/3))+ ("ZAP (x): "+ "["+nb_de_zap+"]").center(int(posx*1/3)))
    
-def show_game_view(difficulte, niveau, score, liste_des_cases, sorte_de_teleporteur, nb_de_zap):
+def show_game_view():
+    liste_des_cases = GameGrid.GameGrid().grid
+    row = GameGrid.GameGrid().rows
+    col = GameGrid.GameGrid().column
+    #les param de Game a renommer
+    difficulte = Game.Game().difficulte
+    niveau = Game.Game().niveau
+    score = Game.Game().score
+    sorte_de_teleporteur = Game.Game().sorte_de_teleporteur
+    nb_de_zap = Game.Game().nb_de_zap
+
     GameView().afficher_header(difficulte, niveau, score)
-    GameView().afficher_les_cases(liste_des_cases)
+    GameView().afficher_les_cases(liste_des_cases, row, col)
     GameView().afficher_footer(sorte_de_teleporteur, nb_de_zap)
