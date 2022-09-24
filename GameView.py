@@ -1,7 +1,6 @@
 from os import get_terminal_size
 
 class GameView():
-    # Il faut game.player.score game.player.name de Game  
     espace_entre_cases = 2
     largeur_case = 5
 
