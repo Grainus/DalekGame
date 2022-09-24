@@ -42,3 +42,8 @@ class GameView():
     def afficher_footer(self, sorte_de_teleporteur, nb_de_zap):    
         posx = get_terminal_size().columns 
         print( ("TELEPORTEUR (z) : " + sorte_de_teleporteur).center(int(posx*1/3)) + (" ").center(int(posx*1/3))+ ("ZAP (x): "+ "["+nb_de_zap+"]").center(int(posx*1/3)))
+   
+def show_game_view(difficulte, niveau, score, liste_des_cases, sorte_de_teleporteur, nb_de_zap):
+    GameView().afficher_header(difficulte, niveau, score)
+    GameView().afficher_les_cases(liste_des_cases)
+    GameView().afficher_footer(sorte_de_teleporteur, nb_de_zap)
