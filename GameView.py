@@ -1,4 +1,4 @@
-from os import get_terminal_size
+from os import get_terminal_size, system
 import GameGrid
 import Game
 
@@ -51,7 +51,7 @@ def show_game_view():
     score = Game.Game().score
     sorte_de_teleporteur = Game.Game().sorte_de_teleporteur
     nb_de_zap = Game.Game().nb_de_zap
-
+    system('cls')
     GameView().afficher_header(difficulte, niveau, score)
     GameView().afficher_les_cases(liste_des_cases, row, col)
     GameView().afficher_footer(sorte_de_teleporteur, nb_de_zap)
