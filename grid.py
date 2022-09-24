@@ -2,7 +2,7 @@
 # Written by : Christopher Perreault
 # Date : 2022-09-17
 # Description : This is the main file for the game's grid logic. It will create the grid, do the unit's movements, etc.
-# Version : 0.1.1
+# Version : 0.2.2
 # Contains : GameGrid, validate_move, make_move, request_move, summon_daleks, find_pos, dalek_to_junk_at, kill_at
 
 # ----------------------------------------------------------------------------------------------------------------------#
@@ -77,27 +77,48 @@ def make_move(gameGrid, move_from, move_to):
 	gameGrid.grid[move_to[0]][move_to[1]] = gameGrid.grid[move_from[0]][move_from[1]]  # move the object
 	gameGrid.grid[move_from[0]][move_from[1]] = ' '  # remove the object from the old position"
 
+def request_move(gameGrid):
+	# request the move to the user
+	move = ""
+	while move not in ['UP', 'UPRIGHT', 'UPLEFT', 'DOWN', 'DOWNRIGHT', 'DOWNLEFT', 'LEFT', 'RIGHT', 'TELEPORT', 'ZAP']:
+		move = input("Move : ").upper() # request the move to be replaced by ludwigs code
+		if validate_move(gameGrid, move):
+			return move
+
 def validate_move(gameGrid, move_request):
 
 	pos = find_doctor(gameGrid)
-	if move_request == 'up':
+	if move_request == 'UP':
 		if pos[0]:  # if the object is not at the top of the grid
 			return True
-	elif move_request == 'down':
+	elif move_request == 'UPRIGHT':
+		if pos[0] and pos[1] != gameGrid.width - 1:  # if the object is not at the top right of the grid
+			return True
+	elif move_request == 'UPLEFT':  # if the object is not at the top left of the grid
+		if pos[0] and pos[1]:
+			return True
+	elif move_request == 'DOWN':
 		if pos[0] < gameGrid.height - 1:
 			return True
-	elif move_request == 'left':
+	elif move_request == 'DOWNRIGHT':
+		if pos[0] < gameGrid.height - 1 and pos[1] < gameGrid.width - 1:
+			return True
+	elif move_request == 'DOWNLEFT':
+		if pos[0] < gameGrid.height - 1 and pos[1]:
+			return True
+	elif move_request == 'LEFT':
 		if pos[1]:
 			return True
-	elif move_request == 'right':
+	elif move_request == 'RIGHT':
 		if pos[1] < gameGrid.width - 1:
 			return True
-	elif move_request == 'teleport':
+
+	elif move_request == 'TELEPORT':
 		return True
-	elif move_request == 'zap':  # To be setup later
+	elif move_request == 'ZAP':  # To be setup later
 		pass
-	else:
-		return False
+
+	return False
 
 def dalek_direction_to_doctor(distance):
 	# find the best route from the dalek to the doctor
