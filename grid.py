@@ -2,7 +2,7 @@
 # Written by : Christopher Perreault
 # Date : 2022-09-25
 # Description : This is the main file for the game's grid logic. It will create the grid, do the unit's movements, etc.
-# Version : 0.3.0
+# Version : 0.3.8
 # Contains :
 #   - The grid class
 #   - The grid's methods
@@ -43,27 +43,20 @@ class GameGrid:
 
 	def summon_daleks(self, dalek_count: int) -> None:
 		# summon the daleks on the grid, depending on how many were asked.
+		dalek_made = 0
 		for i in range(dalek_count):
 			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
-			while self.grid[x][y] != Dalek:
-				if self.grid[x][y] != Junk:
-					if self.grid[x][y] != Doctor:
-						self.grid[x][y] = Dalek
-				else:
-					x, y = randint(0, self.height - 1), randint(0, self.width - 1)
+			while self.grid[x][y] == Dalek or self.grid[x][y] == Junk or self.grid[x][y] == Doctor:  # while the cell is a dalek
+				x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a new random position
+			self.grid[x][y] = Dalek # summon the dalek
 
 	def summon_doctor(self, zap_count) -> None:
 		# summon the doctor on the grid
 		# "Do while" which allows to know if the doctor is going to randomly spawn on a dalek, and if so not to.
-		x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
-		while self.grid[x][y] != Doctor:
-			if self.grid[x][y] != Dalek:
-				if self.grid[x][y] != Junk:
-					self.grid[x][y] = Doctor
-				else:
-					x, y = randint(0, self.height - 1), randint(0, self.width - 1)
-			else:
-				x, y = randint(0, self.height - 1), randint(0, self.width - 1)
+		x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a random position
+		while self.grid[x][y] == Dalek or self.grid[x][y] == Junk:  # while the cell is a dalek or junk
+			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a new random position
+		self.grid[x][y] = Doctor  # summon the doctor
 
 	def find_pos(self, obj) -> list or False:
 		# find the position of the object given
@@ -208,23 +201,19 @@ class GameGrid:
 		daleks.sort(key=lambda x: abs(x[0] - posDoctor[0]) + abs(x[1] - posDoctor[1])) # sort the daleks by distance to the doctor (Trouver en ligne)
 		print(daleks)
 		for dalek in daleks:
-			if self.grid[dalek[0]][dalek[1]] == Dalek:
-				self.move_dalek(posDoctor,dalek)
-
+			if self.grid[dalek[0]][dalek[1]] == Dalek:  # if the dalek is still alive
+				self.move_dalek(posDoctor,dalek)  # move the dalek
 
 	def move_dalek(self, posDoctor, posDalek) -> None:
 		# move the dalek on the grid
-		distance = [posDoctor[0] - posDalek[0], posDoctor[1] - posDalek[1]]
-		direction = self.dalek_direction_to_doctor(distance)
-		if self.validate_move(posDalek, direction):
+		distance = [posDoctor[0] - posDalek[0], posDoctor[1] - posDalek[1]]  # distance between the dalek and the doctor
+		direction = self.dalek_direction_to_doctor(distance)  # find the best route from the dalek to the doctor
+		if self.validate_move(posDalek, direction):  # if the dalek can move in the direction
 			new_pos = self.new_pos(posDalek, direction)
-			if self.grid[new_pos[0]][new_pos[1]] == Dalek:
-				self.kill_at(posDalek)
-				self.junk_at(new_pos)
-			elif self.grid[new_pos[0]][new_pos[1]] == Junk:
-				self.kill_at(posDalek)
+			if self.grid[new_pos[0]][new_pos[1]] == Dalek:  # if the dalek is on the same position as another dalek
+				self.kill_at(posDalek)  # kill the dalek
+				self.junk_at(new_pos)  # kill the other dalek and turn him into junk
+			elif self.grid[new_pos[0]][new_pos[1]] == Junk:  # if the dalek is on the same position as junk
+				self.kill_at(posDalek)  # kill the dalek
 			else:
-				self.make_move(posDalek, new_pos)
-
-
-
+				self.make_move(posDalek, new_pos)  # move the dalek
