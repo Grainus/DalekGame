@@ -14,6 +14,9 @@ class Doctor(NotImplementedClass):
 class Dalek(NotImplementedClass):
     pass
 
+class Junk(NotImplementedClass):
+    pass
+
 
 class Direction(Enum):
     UP = 0
