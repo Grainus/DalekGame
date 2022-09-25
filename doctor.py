@@ -1,19 +1,16 @@
 # ----------------------------------------------------------------------------------------------------------------------#
 # Written by : Christopher Perreault
-# Date : 2022-09-17
+# Date : 2022-09-25
 # Description : This is the doctor's file
-# Version : 0.2.0
-# Contains : innit, can zap, teleport
-
+# Version : 0.2.1
+# Contains :
+#   - The doctor class
+#   - The doctor's methods (can_zap)
 # ----------------------------------------------------------------------------------------------------------------------#
 
 class Doctor:
-	def __init__(self, zap_count: int):
+	def __init__(self, zap_count):
 		self.zap_count = zap_count
-		self.is_alive = True
 
-		def can_zap(self) -> bool:
-			return self.zap_count > 0
-
-		def teleport(self):
-			raise NotImplementedError
+		def can_zap(self):
+			return bool(self.zap_count)
