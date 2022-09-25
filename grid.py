@@ -92,12 +92,9 @@ class GameGrid:
 			return True
 		elif self.validate_move(pos, move):  # if the move is valid
 			newPos = self.new_pos(pos, move)  # get the new position
-			print(self.grid[newPos[0]][newPos[1]])
-			if self.grid[newPos[0]][newPos[1]] != Dalek:  # if the new position is not a dalek
-				if self.grid[newPos[0]][newPos[1]] != Junk:  # if the new position is not junk
-					self.make_move(pos, newPos)  # move the doctor
-					return True
-
+			if self.grid[newPos[0]][newPos[1]] != Dalek or self.grid[newPos[0]][newPos[1]] != Junk:
+				self.make_move(pos, newPos)  # move the doctor
+				return True
 		return False
 
 	def validate_move(self, pos: list, move_request) -> bool:
@@ -148,13 +145,13 @@ class GameGrid:
 				direction += 'RIGHT'
 			elif distance[1] < 0:    # if the doctor is on the left of the dalek
 				direction += 'LEFT'
-
 		elif distance[0] < 0:  # if the doctor is above the dalek
 			direction = 'UP'
 			if distance[1] > 0:  # if the doctor is on the right of the dalek
 				direction += 'RIGHT'
 			elif distance[1] < 0:  # if the doctor is on the left of the dalek
 				direction += 'LEFT'
+
 		else:
 			if distance[1] > 0:  # if the doctor is on the right of the dalek
 				direction = 'RIGHT'
@@ -185,7 +182,7 @@ class GameGrid:
 			return [randint(0, GameGrid.height - 1), randint(0, GameGrid.width - 1)] -> See Aby's code in game instead"""
 
 	def get_all_daleks(self) -> list or False:
-		# get all the daleks in the grid, return false if not Daleks exists
+		# get all the daleks in the grid
 		daleks = []
 		for i in range(self.height):
 			for j in range(self.width):
@@ -197,9 +194,7 @@ class GameGrid:
 		# move all the daleks on the grid
 		posDoctor = self.find_doctor()
 		daleks = self.get_all_daleks()
-		print(daleks)
 		daleks.sort(key=lambda x: abs(x[0] - posDoctor[0]) + abs(x[1] - posDoctor[1])) # sort the daleks by distance to the doctor (Trouver en ligne)
-		print(daleks)
 		for dalek in daleks:
 			if self.grid[dalek[0]][dalek[1]] == Dalek:  # if the dalek is still alive
 				self.move_dalek(posDoctor,dalek)  # move the dalek
