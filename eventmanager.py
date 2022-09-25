@@ -7,7 +7,7 @@ import logging
 from threading import Thread
 
 # Enums used in events
-from models import Direction, Ability
+from models import Direction, Ability, State
 
 
 class Event(object):
@@ -35,6 +35,8 @@ class ExitEvent(Event):
 
 class TickEvent(Event):
     """Sent every game tick."""
+    def __init__(self, state: State):
+        self.state = state
 
 
 class PlayerMoveEvent(Event):

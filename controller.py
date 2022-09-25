@@ -19,7 +19,7 @@ from eventmanager import EventManager, EventListener, Event, \
 
 # Placeholder imports
 from game import Game
-from models import Doctor, Direction, Ability
+from models import Doctor, Direction, Ability, State
 
 
 class Keyboard(EventListener):
@@ -28,6 +28,7 @@ class Keyboard(EventListener):
         super().__init__(eventmanager)
         self.event_queue: SimpleQueue = SimpleQueue()
         self.game = game
+        self.state: State
         self.threaded = True
         self.daemon = True
         
@@ -36,10 +37,15 @@ class Keyboard(EventListener):
         if isinstance(event, BeginEvent):
             self.run()
         elif isinstance(event, TickEvent):
-            # Check if it's currently the player's turn
-            if self.game.turn.current() == Doctor:
-                if not self.event_queue.empty():
-                    self.eventman.post(self.event_queue.get())
+            self.state = event.state
+            if event.state == State.PLAY:
+                # Check if it's currently the player's turn
+                if self.game.turn.current() == Doctor:
+                    if not self.event_queue.empty():
+                        self.eventman.post(self.event_queue.get())
+            elif event.state == State.GAMEOVER:
+                self.event_queue = SimpleQueue() # Clear queue
+            
 
     def run(self) -> NoReturn:
         """Run the input loop forever.
@@ -63,18 +69,23 @@ class Keyboard(EventListener):
         }
 
         while True:
-            _inputbyte = getch()
-            _input: int | str
-            if ord(_inputbyte) == 0: # Arrow keys
-                _input = ord(getch())
-            else:
-                _input = _inputbyte.decode().lower()
+            if self.state == State.PLAY:
+                _inputbyte = getch()
+                _input: int | str
+                if ord(_inputbyte) == 0: # Arrow keys
+                    _input = ord(getch())
+                else:
+                    _input = _inputbyte.decode().lower()
 
-            if _input in directions:
-                self.event_queue.put(
-                    PlayerMoveEvent(directions[_input])
-                )
-            elif _input in abilities:
-                self.event_queue.put(
-                    PlayerAbilityEvent(abilities[_input]) # type: ignore
-                )
+                if _input in directions:
+                    self.event_queue.put(
+                        PlayerMoveEvent(directions[_input])
+                    )
+                elif _input in abilities:
+                    self.event_queue.put(
+                        PlayerAbilityEvent(abilities[_input]) # type: ignore
+                    )
+
+    @staticmethod
+    def get_text() -> str:
+        return input()
