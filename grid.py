@@ -2,7 +2,7 @@
 # Written by : Christopher Perreault
 # Date : 2022-09-25
 # Description : This is the main file for the game's grid logic. It will create the grid, do the unit's movements, etc.
-# Version : 0.2.8
+# Version : 0.3.0
 # Contains :
 #   - The grid class
 #   - The grid's methods
@@ -20,13 +20,14 @@ class GameGrid:
 		self.grid = []
 		self.turn = 0
 		self.create_grid()
-	def create_grid(self):
+
+	def create_grid(self) -> None:
 		for i in range(self.height):
 			self.grid.append([])  # create a new row
 			for k in range(self.width):  # create a new height
 				self.grid[i].append(' ')
 
-	def print_grid(self):
+	def print_grid(self) -> None:
 		# DEBUG ONLY -> print the grid
 		for i in range(self.height):
 			for k in range(self.width):
@@ -64,18 +65,18 @@ class GameGrid:
 			else:
 				x, y = randint(0, self.height - 1), randint(0, self.width - 1)
 
-	def find_pos(self, obj: Doctor | Dalek | Junk) -> list | None:
+	def find_pos(self, obj) -> list or False:
 		# find the position of the object given
 		for i in range(self.height):
 			for k in range(self.width):
 				if self.grid[i][k] == obj:
 					return [i, k]
-		return None
+		return False
 
-	def find_doctor(self) -> list | None:
+	def find_doctor(self) -> list or False:
 		# find the doctor on the grid using find_pos, shortcut.
 		pos = self.find_pos(Doctor)
-		return self.find_pos(self.grid[pos[0]][pos[1]])
+		return pos
 
 	def junk_at(self, dalek_pos: list) -> None:
 		# convert the selected cell to junk, no matter what is on it.
@@ -94,14 +95,19 @@ class GameGrid:
 		# get the move from the user, validates it and then makes the move if and only if it was validated.
 		# Then return if the move was valid or not.
 		pos = self.find_doctor()
-		if self.validate_move(pos, move):  # if the move is valid
-			newPos = self.new_pos(pos, move)  # get the new position
-			self.make_move(pos, newPos)  # make the move
+		if move == 'TELEPORT':
 			return True
-		else:
-			return False
+		elif self.validate_move(pos, move):  # if the move is valid
+			newPos = self.new_pos(pos, move)  # get the new position
+			print(self.grid[newPos[0]][newPos[1]])
+			if self.grid[newPos[0]][newPos[1]] != Dalek:  # if the new position is not a dalek
+				if self.grid[newPos[0]][newPos[1]] != Junk:  # if the new position is not junk
+					self.make_move(pos, newPos)  # move the doctor
+					return True
 
-	def validate_move(self, pos: list, move_request) -> bool: #To Add Direction Type Hint and Ludwigs code somehow with request move
+		return False
+
+	def validate_move(self, pos: list, move_request) -> bool:
 		# validate the move requested by the user
 		if move_request == "UP":
 			if pos[0]:  # if the position is not on the top of the grid
@@ -185,33 +191,40 @@ class GameGrid:
 		"""elif direction == 'TELEPORT':
 			return [randint(0, GameGrid.height - 1), randint(0, GameGrid.width - 1)] -> See Aby's code in game instead"""
 
-	def get_all_daleks(self) -> list:
-		# find all the daleks on the grid
+	def get_all_daleks(self) -> list or False:
+		# get all the daleks in the grid, return false if not Daleks exists
 		daleks = []
 		for i in range(self.height):
-			for k in range(self.width):
-				if self.grid[i][k] == Dalek:
-					daleks.append([i, k])
-		return daleks  # returns a list of all the daleks on the grid /Not real positions ?
+			for j in range(self.width):
+				if self.grid[i][j] == Dalek:
+					daleks.append([i, j])
+		return daleks
 
 	def move_all_daleks(self) -> None:
 		# move all the daleks on the grid
-		doctorPos = self.find_doctor()
-		for dalek in self.get_all_daleks():
-			self.move_dalek(doctorPos, self.find_pos(dalek))  # move each dalek
+		posDoctor = self.find_doctor()
+		daleks = self.get_all_daleks()
+		print(daleks)
+		daleks.sort(key=lambda x: abs(x[0] - posDoctor[0]) + abs(x[1] - posDoctor[1])) # sort the daleks by distance to the doctor (Trouver en ligne)
+		print(daleks)
+		for dalek in daleks:
+			if self.grid[dalek[0]][dalek[1]] == Dalek:
+				self.move_dalek(posDoctor,dalek)
 
-	def move_dalek(self, doctor_pos, dalek_pos) -> None:
+
+	def move_dalek(self, posDoctor, posDalek) -> None:
 		# move the dalek on the grid
-		distance = [doctor_pos[0] - dalek_pos[0], doctor_pos[1] - dalek_pos[1]]  # find the distance between the dalek and the doctor
-		direction = self.dalek_direction_to_doctor(distance)  # find the best route from the dalek to the doctor
-		newPos = self.new_pos(dalek_pos, direction)  # find the new position of the dalek
-		if self.grid[newPos[0]][newPos[1]] != Dalek:  # if the new position is not occupied by another dalek
-			self.make_move(dalek_pos, newPos)  # move the dalek
-		elif self.grid[newPos[0]][newPos[1]] == Dalek:  # if the new position is occupied by another dalek
-			if False:
-				pass # To be setup later, if the dalek is going to another dalek who hasn't move yet, he will move first.
-			else:  # if the dalek is going to another dalek who has already moved
-				self.make_move(dalek_pos, newPos)  # move the dalek
-				self.junk_at(newPos)  # set the case to junk
-		elif self.grid[newPos[0]][newPos[1]] == Junk:  # if the new position is occupied by junk
-			self.kill_at(dalek_pos)  # kill the dalek
+		distance = [posDoctor[0] - posDalek[0], posDoctor[1] - posDalek[1]]
+		direction = self.dalek_direction_to_doctor(distance)
+		if self.validate_move(posDalek, direction):
+			new_pos = self.new_pos(posDalek, direction)
+			if self.grid[new_pos[0]][new_pos[1]] == Dalek:
+				self.kill_at(posDalek)
+				self.junk_at(new_pos)
+			elif self.grid[new_pos[0]][new_pos[1]] == Junk:
+				self.kill_at(posDalek)
+			else:
+				self.make_move(posDalek, new_pos)
+
+
+
