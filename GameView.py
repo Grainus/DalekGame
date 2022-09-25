@@ -69,7 +69,7 @@ class GameView:
         difficulte = self.game.difficulty
         niveau = self.game.niveau
         score = self.game.score
-        nb_de_zap = self.game.zap
+        nb_de_zap = self.game.doctor.zap_count
         system('cls')
         GameView().afficher_header(niveau, score)
         GameView().afficher_les_cases(liste_des_cases, row, col)
