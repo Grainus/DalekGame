@@ -38,6 +38,14 @@ class Difficulty(Enum):
     HARD = 2
 
 
+class State(Enum):
+    MENU = 0
+    PLAY = 1
+    TEXTINPUT = 2
+    GAMEOVER = 3
+    HIGHSCORE = 4
+
+
 class Turn:
     def __init__(self, turns: Sequence[type]):
         self.turns = turns
