@@ -1,9 +1,9 @@
 
-from operator import is_
-from eventmanager import BeginEvent, Event,ExitEvent,EventManager,EventListener, PlayerAbilityEvent
-from models import Doctor, Dalek, Ability, Junk
+from eventmanager import BeginEvent, Event,ExitEvent,EventManager, PlayerAbilityEvent
+from models import Doctor, Ability, Junk
 from grid import GameGrid
 from enum import Enum
+from dalek import Dalek
 
 class Turn(Enum):
     DOCTOR = 0
@@ -19,14 +19,13 @@ class PlayMode(Enum):
     DEBUG = 1
 
 class Game:
-    
     def __init__(self, event_manager: EventManager,grid :GameGrid, difficulty : Difficulty, play_mode : PlayMode):
 
         self.difficulty=difficulty
         self.play_mode=play_mode
 
-        self.score=0
-        self.wave_number = 1
+        self.score = 0
+        self.niveau = 1
 
         self.turn= Turn.DOCTOR
 
@@ -34,27 +33,29 @@ class Game:
         self.grid = grid
     
     def start_game(self):
-        self.grid.summon_daleks(5*self.wave_number)
-        self.grid.summon_doctor()
         self.start_wave()
     
     def end_game(self):
         pass
 
     def start_wave(self):
-        self
+        self.grid.summon_daleks(5*self.niveau)
+        self.grid.summon_doctor()
 
     def end_wave(self):
-        self.wave_number+=1
+        self.niveau+=1
+        doc_pos = self.grid.find_doctor()
+        self.grid.grid[doc_pos[0]][doc_pos[1]] = None
+        #self.start_wave() to be added depending on the working of game engine
 
     def start_round(self):
         self.turn=Turn.DOCTOR
 
     def end_round(self):
-        self.update_score()
+        self.score = self.update_score()
 
     def update_score(self)->int:
-        return (5*self.wave_number) - (self.grid.get_all_daleks().length)
+        return (5*self.niveau) - (len(self.grid.get_all_daleks()))
 
     def check_teleport(self):
         if(self.difficulty == Difficulty.FACILE):
