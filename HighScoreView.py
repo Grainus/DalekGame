@@ -1,7 +1,7 @@
 from os import get_terminal_size, system
 
 from highscore import HighScore
-from eventmanager import EventManager, EventListener, Event, DrawEvent
+from eventmanager import EventListener, Event, DrawEvent
 from models import State
 
 class HighScoreView(EventListener):
