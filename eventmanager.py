@@ -51,7 +51,7 @@ class PlayerAbilityEvent(Event):
         self.ability = ability
 
 
-class DrawEvent(Event):
+class DrawEvent(TickEvent):
     """Sent when the display needs to be updated.
 
     This allows the game to not draw on every frame \
