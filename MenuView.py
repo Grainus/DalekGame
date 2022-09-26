@@ -1,4 +1,5 @@
 from os import get_terminal_size, system
+from tkinter import Menu
 #peut etre faire de menuView et highScoreView des sous classes de GameView
 
 from eventmanager import EventListener, Event, DrawEvent
@@ -14,11 +15,23 @@ class MenuView(EventListener):
     def afficher_menu():
         system('cls')
         termsize = get_terminal_size().columns
-        print("\n"+("DALEK GAME\n").center(termsize)+"\n"+
-        ("Choose your option...").center(termsize)+"\n"+
-        " "*int(termsize*1/6)+"Difficulty  1. Easy\n"+ 
-        " "*int(termsize*1/6+len("Difficulty  "))+"2: Medium\n"+
-        " "*int(termsize*1/6+len("Difficulty  "))+"3. Hard\n\n"+
-        " "*int(termsize*1/6)+"Debug mode: (Fin ou 01) \n\n"+
-        ("C = Case  D = Doctor  X = Dalek  J = Junk").center(termsize)+"\n\n"+
-        ("PRESS ENTER TO CONTINUE...").center(termsize)+"\n")
+        termsix = termsize * 1/6
+        diffoffset = " " * int(termsix + len("Difficulty  "))
+        print(f"""
+{"DALEK GAME".center(termsize)}
+{"Choose your option...".center(termsize)}
+{" " * int(termsix)}Difficulty  1. Easy
+{diffoffset}2. Medium
+{diffoffset}3. Hard
+
+{" " * int(termsix)}Debug mode: (Fin ou 01)
+
+
+{"C = Case  D = Doctor  X = Dalek  J = Junk".center(termsize)}
+
+
+{"PRESS ENTER TO CONTINUE...".center(termsize)}
+"""
+        )
+        
+MenuView.afficher_menu()
