@@ -1,68 +1,75 @@
 from os import get_terminal_size, system
+
 from game import Game
+from eventmanager import EventManager, EventListener, Event, DrawEvent
+from models import State, Difficulty, Doctor, Dalek, Junk
 
-class GameView:
-    # Il faut game.player.score game.player.name de Game  
-    def __init__(self, game : Game):
+class GameView(EventListener):
+    def __init__(self, eventmanager: EventManager, game : Game):
+        super().__init__(eventmanager)
         self.game = game
-        self.espace_entre_cases = int(get_terminal_size().columns * 1/50)
-        self.espace_entre_casesy =  int(get_terminal_size().lines * 1/20)
-        self.largeur_case  = int(get_terminal_size().columns * 1/30)
-        self.hauteur_case  = int(get_terminal_size().columns * 1/55)
+        
+    
+    def notify(self, event: Event) -> None:
+        if isinstance(event, DrawEvent):
+            if event.state == State.PLAY:
+                self.show_game_view()
+    
+    @staticmethod
+    def _get_vars() -> tuple:
+        termsize = get_terminal_size()
+        between_x = int(termsize.columns * 1/50)
+        between_y = int(termsize.lines * 1/20)
+        width  = int(termsize.columns * 1/30)
+        height  = int(termsize.columns * 1/55)
+        return between_x, between_y, width, height
 
+    @staticmethod
     def afficher_header(self, niveau, score):
-        if (self.game.difficulty == 0):
-            difficulte = "Facile"
-        if (self.game.difficulty == 1):
-            difficulte = "Moyen"
-        if (self.game.difficulty == 2):
-            difficulte = "Difficile"
-
+        diff = self.game.difficulty.name.title()
         posx = get_terminal_size().columns 
         print()
-        print( ("Difficulte: "+difficulte).center(int(posx*1/3)) +("Niveau: " + niveau).center(int((posx * 1/3))) + ("Score: " + score).center(int(posx*1/3)))
+        print( ("Difficulty: " + diff).center(int(posx*1/3)) +("Niveau: " + niveau).center(int((posx * 1/3))) + ("Score: " + score).center(int(posx*1/3)))
         print()
 
-    def afficher_les_cases(self, info_de_la_case, rows, col):#info_de_la_case = grid, module a appeler a la fin d'une action valide
-        ligne_a_afficher = "" 
+    @staticmethod
+    def afficher_les_cases(grid):
+        between_x, between_y, width, height = GameView._get_vars()
         #Boucle pour string des cases, une fois qu'on a la string il faut simplement la print(string) n fois pour faire la heuteur de la case
-        for nb_rows in range(col): 
-            for nb_col in range(rows):
-                if (info_de_la_case[nb_rows][nb_col] == 'D'):
-                    ligne_a_afficher += (("X"*self.largeur_case)+(" "*self.espace_entre_cases))
-
-                elif (info_de_la_case[nb_rows][nb_col] == 'J'):
-                    ligne_a_afficher += (("F"*self.largeur_case)+(" "*self.espace_entre_cases))
-
-                elif (info_de_la_case[nb_rows][nb_col] == 'A'):
-                    ligne_a_afficher += (("D"*self.largeur_case)+(" "*self.espace_entre_cases))
-
-                elif (info_de_la_case[nb_rows][nb_col] == ' '):
-                    ligne_a_afficher += (("C"*self.largeur_case)+(" "*self.espace_entre_cases))
-                
+        sep = " " * between_x
+        for row in grid.grid: 
+            output = "" 
+            for cell in row:
+                if isinstance(cell, Doctor):
+                    output += "X" * width + sep
+                elif isinstance(cell, Junk):
+                    output += "J" * width + sep
+                elif isinstance(cell, Dalek):
+                    output += "D" * width + sep
                 else:
-                    None
-            for i in range(self.hauteur_case):
+                    output += "C" * width + sep
+                    
+            for i in range(height):
                 #Ne pas oublier d'enlever le "  " a la fin des strings quand on affiche le jeu bien centrer ex: "CCCCC  CCCCC  " -> "CCCCC  CCCCC"
-                print(ligne_a_afficher.center(get_terminal_size().columns - self.espace_entre_cases))
-            for j in range(self.espace_entre_casesy):
-                print("")
-            ligne_a_afficher = "" #Ensuite la remettre a "" pour la deuxieme rangee de cases et ainsi de suite    
+                # you mean rstrip() ??
+                print(output.center(get_terminal_size().columns - between_x))
+            print('\n' * between_y)  
 
-    def afficher_footer(self, difficulte, nb_de_zap): 
-        if (difficulte == 0):
-            sorte_de_teleporteur = "Securitaire"
-        if (difficulte == 1):
-            sorte_de_teleporteur = "Normale"
-        if (difficulte == 2):   
-            sorte_de_teleporteur = "Dangereux"
+    @staticmethod
+    def afficher_footer(difficulte, nb_de_zap): 
+        if (difficulte == Difficulty.EASY):
+            sorte_de_teleporteur = "Safe"
+        if (difficulte == Difficulty.MEDIUM):
+            sorte_de_teleporteur = "Normal"
+        if (difficulte == Difficulty.HARD):   
+            sorte_de_teleporteur = "Dangerous"
+            
         posx = get_terminal_size().columns 
         print( ("TELEPORTEUR (z) : " + sorte_de_teleporteur).center(int(posx*1/3)) + (" ").center(int(posx*1/3))+ 
         ("ZAP (x): "+ "["+nb_de_zap+"]").center(int(posx*1/3))+"\n")
 
     def show_game_view(self):
-
-        liste_des_cases = self.game.grid
+        grid = self.game.grid
         row = self.game.grid.width
         col = self.game.grid.height
         #les param de Game a renommer
@@ -71,6 +78,6 @@ class GameView:
         score = self.game.score
         nb_de_zap = self.game.doctor.zap_count
         system('cls')
-        GameView().afficher_header(niveau, score)
-        GameView().afficher_les_cases(liste_des_cases, row, col)
-        GameView().afficher_footer(difficulte, nb_de_zap)
+        GameView.afficher_header(niveau, score)
+        GameView.afficher_les_cases(grid, row, col)
+        GameView.afficher_footer(difficulte, nb_de_zap)
