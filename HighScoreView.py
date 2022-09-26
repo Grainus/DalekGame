@@ -33,6 +33,8 @@ class HighScoreView(EventListener):
     def afficher_tableau_score() -> None:
         system('cls')
         HighScoreView.afficher_header()
-        for score in HighScore.get_scores():
-            HighScoreView.afficher_score(score)
+        scores = HighScore.get_scores()
+        if scores is not None:
+            for score in scores:
+                HighScoreView.afficher_score(score)
         print('\n')
