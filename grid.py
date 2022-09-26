@@ -12,7 +12,9 @@
 from random import randint
 from models import Dalek, Junk
 from doctor import Doctor
+from typing import Type
 
+# Add isInstance() to the list of types
 
 class GameGrid:
 	def __init__(self, width=8, height=6):
@@ -32,11 +34,11 @@ class GameGrid:
 		# DEBUG ONLY -> print the grid
 		for i in range(self.height):
 			for k in range(self.width):
-				if self.grid[i][k] == Doctor:
+				if isinstance(self.grid[i][k], Doctor):
 					print('D', end='/')
-				elif self.grid[i][k] == Dalek:
+				elif isinstance(self.grid[i][k], Dalek):
 					print('X', end='/')
-				elif self.grid[i][k] == Junk:
+				elif isinstance(self.grid[i][k], Junk):
 					print('J', end='/')
 				else:
 					print(' ', end='/')
@@ -46,29 +48,32 @@ class GameGrid:
 		# summon the daleks on the grid, depending on how many were asked.
 		for i in range(dalek_count):
 			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
-			while self.grid[x][y] == Dalek or self.grid[x][y] == Junk or self.grid[x][y] == Doctor:
+			while isinstance(self.grid[x][y], Dalek) or isinstance(self.grid[x][y], Junk)\
+					or isinstance(self.grid[x][y], Doctor):
 				x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
 			self.grid[x][y] = Dalek()
 
-	def summon_doctor(self, zap_count) -> None:
+	def summon_doctor(self, zap_count: int) -> None:
 		# summon the doctor on the grid
 		# "Do while" which allows to know if the doctor is going to randomly spawn on a dalek, and if so not to.
 		x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
-		while self.grid[x][y] == Dalek or self.grid[x][y] == Junk:
+		while isinstance(self.grid[x][y], Dalek) or isinstance(self.grid[x][y], Junk):
 			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
 		self.grid[x][y] = Doctor(zap_count)
 
-	def find_pos(self, obj: Doctor or Dalek or Junk) -> list or False:
+	def find_pos(self, obj_type: Type[Doctor] | Type[Dalek] | Type[Junk]) -> list | None:
 		# find the position of the object given
 		for i in range(self.height):
 			for k in range(self.width):
-				if self.grid[i][k] == obj:
+				if isinstance(self.grid[i][k],obj_type):
 					return [i, k]
-		return False
+		return None
 
-	def find_doctor(self) -> list or False:
+	def find_doctor(self) -> list | None:
 		# find the doctor on the grid using find_pos, shortcut.
 		pos = self.find_pos(Doctor)
+		if pos == None:
+			return None
 		return pos
 
 	def junk_at(self, dalek_pos: list) -> None:
@@ -92,7 +97,7 @@ class GameGrid:
 			return True
 		elif self.validate_move(pos, move):
 			newPos = self.new_pos(pos, move)
-			if self.grid[newPos[0]][newPos[1]] != Dalek or self.grid[newPos[0]][newPos[1]] != Junk:
+			if not isinstance(self.grid[newPos[0]][newPos[1]], Dalek) or not isinstance(self.grid[newPos[0]][newPos[1]], Junk):
 				self.make_move(pos, newPos)
 				return True
 		return False
@@ -127,7 +132,7 @@ class GameGrid:
 			if self.grid[pos[0]][pos[1]] == Doctor:
 				return True
 		elif move_request == 'ZAP':
-			if self.grid[pos[0]][pos[1]] == Doctor:
+			if isinstance(self.grid[pos[0]][pos[1]], Doctor):
 				if self.grid[pos[0]][pos[1]].can_zap():
 					self.grid[pos[0]][pos[1]].zapcount -= 1
 					return True
@@ -177,14 +182,17 @@ class GameGrid:
 		"""elif direction == 'TELEPORT':
 			return [randint(0, GameGrid.height - 1), randint(0, GameGrid.width - 1)] -> See Aby's code in game instead"""
 
-	def get_all_daleks(self) -> list or False:
+	def get_all_daleks(self) -> list | None:
 		# get all the daleks in the grid
 		daleks = []
 		for i in range(self.height):
 			for j in range(self.width):
-				if self.grid[i][j] == Dalek:
+				if isinstance(self.grid[i][j], Dalek):
 					daleks.append([i, j])
-		return daleks
+		if daleks:
+			return daleks
+		else:
+			return None
 
 	def move_all_daleks(self) -> None:
 		# move all the daleks on the grid
@@ -193,7 +201,7 @@ class GameGrid:
 		daleks.sort(key=lambda x: abs(x[0] - posdoctor[0]) + abs(x[1] - posdoctor[1]))
 		# sort the daleks by distance to the doctor (Trouver en ligne)
 		for dalek in daleks:
-			if self.grid[dalek[0]][dalek[1]] == Dalek:
+			if isinstance(self.grid[dalek[0]][dalek[1]], Dalek):
 				self.move_dalek(posdoctor, dalek)
 
 	def move_dalek(self, pos_doctor: list, pos_dalek: list) -> None:
@@ -202,10 +210,11 @@ class GameGrid:
 		direction = self.dalek_direction_to_doctor(distance)
 		if self.validate_move(pos_dalek, direction):
 			new_pos = self.new_pos(pos_dalek, direction)
-			if self.grid[new_pos[0]][new_pos[1]] == Dalek: # Not done, waiting for Abys code
+			print(new_pos)
+			if isinstance(self.grid[new_pos[0]][new_pos[1]], Dalek):  # Not done, waiting for Abys code
 				self.kill_at(pos_dalek)
 				self.junk_at(new_pos)
-			elif self.grid[new_pos[0]][new_pos[1]] == Junk:
+			elif isinstance(self.grid[new_pos[0]][new_pos[1]], Junk):
 				self.kill_at(pos_dalek)
 			else:
 				self.make_move(pos_dalek, new_pos)
