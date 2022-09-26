@@ -9,8 +9,8 @@
 # ----------------------------------------------------------------------------------------------------------------------#
 
 class Doctor:
-	def __init__(self, zap_count):
+	def __init__(self, zap_count: int):
 		self.zap_count = zap_count
 
-	def can_zap(self):
+	def can_zap(self) -> bool:
 		return bool(self.zap_count)
