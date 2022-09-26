@@ -13,6 +13,7 @@ from random import randint
 from models import Dalek, Junk
 from doctor import Doctor
 
+
 class GameGrid:
 	def __init__(self, width=8, height=6):
 		self.width = width
@@ -43,12 +44,11 @@ class GameGrid:
 
 	def summon_daleks(self, dalek_count: int) -> None:
 		# summon the daleks on the grid, depending on how many were asked.
-		dalek_made = 0
 		for i in range(dalek_count):
 			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
 			while self.grid[x][y] == Dalek or self.grid[x][y] == Junk or self.grid[x][y] == Doctor:  # while the cell is a dalek
 				x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a new random position
-			self.grid[x][y] = Dalek # summon the dalek
+			self.grid[x][y] = Dalek  # summon the dalek
 
 	def summon_doctor(self, zap_count) -> None:
 		# summon the doctor on the grid
@@ -56,9 +56,9 @@ class GameGrid:
 		x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a random position
 		while self.grid[x][y] == Dalek or self.grid[x][y] == Junk:  # while the cell is a dalek or junk
 			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a new random position
-		self.grid[x][y] = Doctor  # summon the doctor
+		self.grid[x][y] = Doctor(zap_count)  # summon the doctor
 
-	def find_pos(self, obj: list) -> list or False:
+	def find_pos(self, obj: Doctor or Dalek or Junk) -> list or False:
 		# find the position of the object given
 		for i in range(self.height):
 			for k in range(self.width):
@@ -84,7 +84,7 @@ class GameGrid:
 		self.grid[move_to[0]][move_to[1]] = self.grid[move_from[0]][move_from[1]]  # move the object
 		self.grid[move_from[0]][move_from[1]] = None  # remove the object from the old position
 
-	def request_move(self, move : str) -> bool:
+	def request_move(self, move: str) -> bool:
 		# get the move from the user, validates it and then makes the move if and only if it was validated.
 		# Then return if the move was valid or not.
 		pos = self.find_doctor()
@@ -97,7 +97,7 @@ class GameGrid:
 				return True
 		return False
 
-	def validate_move(self, pos: list, move_request : str) -> bool:
+	def validate_move(self, pos: list, move_request: str) -> bool:
 		# validate the move requested by the user
 		if move_request == "UP":
 			if pos[0]:  # if the position is not on the top of the grid
@@ -194,7 +194,8 @@ class GameGrid:
 		# move all the daleks on the grid
 		posdoctor = self.find_doctor()
 		daleks = self.get_all_daleks()
-		daleks.sort(key=lambda x: abs(x[0] - posdoctor[0]) + abs(x[1] - posdoctor[1])) # sort the daleks by distance to the doctor (Trouver en ligne)
+		daleks.sort(key=lambda x: abs(x[0] - posdoctor[0]) + abs(x[1] - posdoctor[1]))
+		# sort the daleks by distance to the doctor (Trouver en ligne)
 		for dalek in daleks:
 			if self.grid[dalek[0]][dalek[1]] == Dalek:  # if the dalek is still alive
 				self.move_dalek(posdoctor, dalek)  # move the dalek
