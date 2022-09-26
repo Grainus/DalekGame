@@ -2,7 +2,7 @@
 # Written by : Christopher Perreault
 # Date : 2022-09-25
 # Description : This is the main file for the game's grid logic. It will create the grid, do the unit's movements, etc.
-# Version : 0.3.9
+# Version : 0.4.0
 # Contains :
 #   - The grid class
 #   - The grid's methods
@@ -24,8 +24,8 @@ class GameGrid:
 
 	def create_grid(self) -> None:
 		for i in range(self.height):
-			self.grid.append([])  # create a new row
-			for k in range(self.width):  # create a new height
+			self.grid.append([])
+			for k in range(self.width):
 				self.grid[i].append(' ')
 
 	def print_grid(self) -> None:
@@ -46,17 +46,17 @@ class GameGrid:
 		# summon the daleks on the grid, depending on how many were asked.
 		for i in range(dalek_count):
 			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
-			while self.grid[x][y] == Dalek or self.grid[x][y] == Junk or self.grid[x][y] == Doctor:  # while the cell is a dalek
-				x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a new random position
-			self.grid[x][y] = Dalek  # summon the dalek
+			while self.grid[x][y] == Dalek or self.grid[x][y] == Junk or self.grid[x][y] == Doctor:
+				x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
+			self.grid[x][y] = Dalek()
 
 	def summon_doctor(self, zap_count) -> None:
 		# summon the doctor on the grid
 		# "Do while" which allows to know if the doctor is going to randomly spawn on a dalek, and if so not to.
-		x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a random position
-		while self.grid[x][y] == Dalek or self.grid[x][y] == Junk:  # while the cell is a dalek or junk
-			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a new random position
-		self.grid[x][y] = Doctor(zap_count)  # summon the doctor
+		x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
+		while self.grid[x][y] == Dalek or self.grid[x][y] == Junk:
+			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]
+		self.grid[x][y] = Doctor(zap_count)
 
 	def find_pos(self, obj: Doctor or Dalek or Junk) -> list or False:
 		# find the position of the object given
@@ -81,8 +81,8 @@ class GameGrid:
 
 	def make_move(self, move_from: list, move_to: list) -> None:
 		# move the object from the move_from position to the move_to position
-		self.grid[move_to[0]][move_to[1]] = self.grid[move_from[0]][move_from[1]]  # move the object
-		self.grid[move_from[0]][move_from[1]] = None  # remove the object from the old position
+		self.grid[move_to[0]][move_to[1]] = self.grid[move_from[0]][move_from[1]]
+		self.grid[move_from[0]][move_from[1]] = None
 
 	def request_move(self, move: str) -> bool:
 		# get the move from the user, validates it and then makes the move if and only if it was validated.
@@ -90,74 +90,70 @@ class GameGrid:
 		pos = self.find_doctor()
 		if move == 'TELEPORT':
 			return True
-		elif self.validate_move(pos, move):  # if the move is valid
-			newPos = self.new_pos(pos, move)  # get the new position
+		elif self.validate_move(pos, move):
+			newPos = self.new_pos(pos, move)
 			if self.grid[newPos[0]][newPos[1]] != Dalek or self.grid[newPos[0]][newPos[1]] != Junk:
-				self.make_move(pos, newPos)  # move the doctor
+				self.make_move(pos, newPos)
 				return True
 		return False
 
 	def validate_move(self, pos: list, move_request: str) -> bool:
 		# validate the move requested by the user
 		if move_request == "UP":
-			if pos[0]:  # if the position is not on the top of the grid
+			if pos[0]:
 				return True
 		elif move_request == 'UPRIGHT':
-			if pos[0] and pos[1] != self.width - 1:   # if the position is not on the top right of the grid
+			if pos[0] and pos[1] != self.width - 1:
 				return True
 		elif move_request == 'UPLEFT':
-			if pos[0] and pos[1]:  # if the position is not on the top left of the grid
+			if pos[0] and pos[1]:
 				return True
 		elif move_request == 'DOWN':
-			if pos[0] < self.height - 1:  # if the position is not on the bottom of the grid
+			if pos[0] < self.height - 1:
 				return True
 		elif move_request == 'DOWNRIGHT':
-			if pos[0] < self.height - 1 and pos[1] < self.width - 1:  # if the position is not on the
-				# bottom right of the grid
+			if pos[0] < self.height - 1 and pos[1] < self.width - 1:
 				return True
 		elif move_request == 'DOWNLEFT':
-			if pos[0] < self.height - 1 and pos[1]:  # if the position is not on the bottom left of the grid
+			if pos[0] < self.height - 1 and pos[1]:
 				return True
-		elif move_request == 'LEFT':  # if the position is not on the left of the grid
+		elif move_request == 'LEFT':
 			if pos[1]:
 				return True
-		elif move_request == 'RIGHT':  # if the position is not on the right of the grid
+		elif move_request == 'RIGHT':
 			if pos[1] < self.width - 1:
 				return True
-
 		elif move_request == 'TELEPORT':  # Always true if doctor
 			if self.grid[pos[0]][pos[1]] == Doctor:
 				return True
-
-		elif move_request == 'ZAP':  # To be setup later
+		elif move_request == 'ZAP':
 			if self.grid[pos[0]][pos[1]] == Doctor:
 				if self.grid[pos[0]][pos[1]].can_zap():
 					self.grid[pos[0]][pos[1]].zapcount -= 1
 					return True
-
 		return False
 
 	def dalek_direction_to_doctor(self, distance: list) -> str:
 		# get the direction to the doctor from the distance between the dalek and the doctor
-		if distance[0] > 0:  # if the doctor is below the dalek
+		if distance[0] > 0:
 			direction = 'DOWN'
-			if distance[1] > 0:    # if the doctor is on the right of the dalek
+			if distance[1] > 0:
 				direction += 'RIGHT'
-			elif distance[1] < 0:    # if the doctor is on the left of the dalek
+			elif distance[1] < 0:
 				direction += 'LEFT'
-		elif distance[0] < 0:  # if the doctor is above the dalek
+		elif distance[0] < 0:
 			direction = 'UP'
-			if distance[1] > 0:  # if the doctor is on the right of the dalek
+			if distance[1] > 0:
 				direction += 'RIGHT'
-			elif distance[1] < 0:  # if the doctor is on the left of the dalek
+			elif distance[1] < 0:
 				direction += 'LEFT'
 
 		else:
-			if distance[1] > 0:  # if the doctor is on the right of the dalek
+			if distance[1] > 0:
 				direction = 'RIGHT'
-			elif distance[1] < 0:  # if the doctor is on the left of the dalek
+			elif distance[1] < 0:
 				direction = 'LEFT'
-			else:  # if the doctor is on the same position as the dalek or that the doctor is not there
+			else:
 				direction = 'NONE'
 		return direction
 
@@ -197,19 +193,19 @@ class GameGrid:
 		daleks.sort(key=lambda x: abs(x[0] - posdoctor[0]) + abs(x[1] - posdoctor[1]))
 		# sort the daleks by distance to the doctor (Trouver en ligne)
 		for dalek in daleks:
-			if self.grid[dalek[0]][dalek[1]] == Dalek:  # if the dalek is still alive
-				self.move_dalek(posdoctor, dalek)  # move the dalek
+			if self.grid[dalek[0]][dalek[1]] == Dalek:
+				self.move_dalek(posdoctor, dalek)
 
 	def move_dalek(self, pos_doctor: list, pos_dalek: list) -> None:
 		# move the dalek on the grid
-		distance = [pos_doctor[0] - pos_dalek[0], pos_doctor[1] - pos_dalek[1]]  # distance between the dalek and the doctor
-		direction = self.dalek_direction_to_doctor(distance)  # find the best route from the dalek to the doctor
-		if self.validate_move(pos_dalek, direction):  # if the dalek can move in the direction
+		distance = [pos_doctor[0] - pos_dalek[0], pos_doctor[1] - pos_dalek[1]]
+		direction = self.dalek_direction_to_doctor(distance)
+		if self.validate_move(pos_dalek, direction):
 			new_pos = self.new_pos(pos_dalek, direction)
-			if self.grid[new_pos[0]][new_pos[1]] == Dalek:  # if the dalek is on the same position as another dalek
-				self.kill_at(pos_dalek)  # kill the dalek
-				self.junk_at(new_pos)  # kill the other dalek and turn him into junk
-			elif self.grid[new_pos[0]][new_pos[1]] == Junk:  # if the dalek is on the same position as junk
-				self.kill_at(pos_dalek)  # kill the dalek
+			if self.grid[new_pos[0]][new_pos[1]] == Dalek: # Not done, waiting for Abys code
+				self.kill_at(pos_dalek)
+				self.junk_at(new_pos)
+			elif self.grid[new_pos[0]][new_pos[1]] == Junk:
+				self.kill_at(pos_dalek)
 			else:
-				self.make_move(pos_dalek, new_pos)  # move the dalek
+				self.make_move(pos_dalek, new_pos)
