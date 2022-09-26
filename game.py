@@ -1,0 +1,12 @@
+"""Placeholder class to develop components that require it."""
+
+from eventmanager import EventManager, EventListener
+from models import Difficulty, Doctor, Dalek, Turn
+
+class Game(EventListener):
+    def __init__(self, eventmanager: EventManager):
+        super().__init__(eventmanager)
+        turns = [Doctor, Dalek]
+        self.turn = Turn(turns)
+        self.difficulty: Difficulty
+        self.score = 0
