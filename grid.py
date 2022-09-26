@@ -10,7 +10,8 @@
 #   - Logic for the movement of the units
 # ----------------------------------------------------------------------------------------------------------------------#
 from random import randint
-from models import Dalek, Junk
+from dalek import Dalek
+from models import Junk
 from doctor import Doctor
 from typing import Type
 
@@ -200,8 +201,9 @@ class GameGrid:
 		daleks = self.get_all_daleks()
 		daleks.sort(key=lambda x: abs(x[0] - posdoctor[0]) + abs(x[1] - posdoctor[1]))
 		# sort the daleks by distance to the doctor (Trouver en ligne)
+		self.turn += 1
 		for dalek in daleks:
-			if isinstance(self.grid[dalek[0]][dalek[1]], Dalek):
+			if isinstance(self.grid[dalek[0]][dalek[1]], Dalek) and self.grid[dalek[0]][dalek[1]].move_count < self.turn:
 				self.move_dalek(posdoctor, dalek)
 
 	def move_dalek(self, pos_doctor: list, pos_dalek: list) -> None:
@@ -212,8 +214,11 @@ class GameGrid:
 			new_pos = self.new_pos(pos_dalek, direction)
 			print(new_pos)
 			if isinstance(self.grid[new_pos[0]][new_pos[1]], Dalek):  # Not done, waiting for Abys code
-				self.kill_at(pos_dalek)
-				self.junk_at(new_pos)
+				if self.grid[new_pos[0]][new_pos[1]].move_count < self.turn:
+					self.move_dalek(pos_doctor, new_pos)
+				else:
+					self.kill_at(pos_dalek)
+					self.junk_at(new_pos)
 			elif isinstance(self.grid[new_pos[0]][new_pos[1]], Junk):
 				self.kill_at(pos_dalek)
 			else:
