@@ -1,5 +1,4 @@
 from os import get_terminal_size, system
-from tkinter import Menu
 #peut etre faire de menuView et highScoreView des sous classes de GameView
 
 from eventmanager import EventListener, Event, DrawEvent
