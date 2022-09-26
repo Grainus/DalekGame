@@ -2,7 +2,7 @@
 # Written by : Christopher Perreault
 # Date : 2022-09-25
 # Description : This is the main file for the game's grid logic. It will create the grid, do the unit's movements, etc.
-# Version : 0.3.8
+# Version : 0.3.9
 # Contains :
 #   - The grid class
 #   - The grid's methods
@@ -58,7 +58,7 @@ class GameGrid:
 			x, y = [randint(0, self.height - 1), randint(0, self.width - 1)]  # get a new random position
 		self.grid[x][y] = Doctor  # summon the doctor
 
-	def find_pos(self, obj) -> list or False:
+	def find_pos(self, obj: list) -> list or False:
 		# find the position of the object given
 		for i in range(self.height):
 			for k in range(self.width):
@@ -97,7 +97,7 @@ class GameGrid:
 				return True
 		return False
 
-	def validate_move(self, pos: list, move_request) -> bool:
+	def validate_move(self, pos: list, move_request : str) -> bool:
 		# validate the move requested by the user
 		if move_request == "UP":
 			if pos[0]:  # if the position is not on the top of the grid
@@ -138,7 +138,7 @@ class GameGrid:
 		return False
 
 	def dalek_direction_to_doctor(self, distance: list) -> str:
-		# find the best route from the dalek to the doctor
+		# get the direction to the doctor from the distance between the dalek and the doctor
 		if distance[0] > 0:  # if the doctor is below the dalek
 			direction = 'DOWN'
 			if distance[1] > 0:    # if the doctor is on the right of the dalek
@@ -192,23 +192,23 @@ class GameGrid:
 
 	def move_all_daleks(self) -> None:
 		# move all the daleks on the grid
-		posDoctor = self.find_doctor()
+		posdoctor = self.find_doctor()
 		daleks = self.get_all_daleks()
-		daleks.sort(key=lambda x: abs(x[0] - posDoctor[0]) + abs(x[1] - posDoctor[1])) # sort the daleks by distance to the doctor (Trouver en ligne)
+		daleks.sort(key=lambda x: abs(x[0] - posdoctor[0]) + abs(x[1] - posdoctor[1])) # sort the daleks by distance to the doctor (Trouver en ligne)
 		for dalek in daleks:
 			if self.grid[dalek[0]][dalek[1]] == Dalek:  # if the dalek is still alive
-				self.move_dalek(posDoctor,dalek)  # move the dalek
+				self.move_dalek(posdoctor, dalek)  # move the dalek
 
-	def move_dalek(self, posDoctor, posDalek) -> None:
+	def move_dalek(self, pos_doctor: list, pos_dalek: list) -> None:
 		# move the dalek on the grid
-		distance = [posDoctor[0] - posDalek[0], posDoctor[1] - posDalek[1]]  # distance between the dalek and the doctor
+		distance = [pos_doctor[0] - pos_dalek[0], pos_doctor[1] - pos_dalek[1]]  # distance between the dalek and the doctor
 		direction = self.dalek_direction_to_doctor(distance)  # find the best route from the dalek to the doctor
-		if self.validate_move(posDalek, direction):  # if the dalek can move in the direction
-			new_pos = self.new_pos(posDalek, direction)
+		if self.validate_move(pos_dalek, direction):  # if the dalek can move in the direction
+			new_pos = self.new_pos(pos_dalek, direction)
 			if self.grid[new_pos[0]][new_pos[1]] == Dalek:  # if the dalek is on the same position as another dalek
-				self.kill_at(posDalek)  # kill the dalek
+				self.kill_at(pos_dalek)  # kill the dalek
 				self.junk_at(new_pos)  # kill the other dalek and turn him into junk
 			elif self.grid[new_pos[0]][new_pos[1]] == Junk:  # if the dalek is on the same position as junk
-				self.kill_at(posDalek)  # kill the dalek
+				self.kill_at(pos_dalek)  # kill the dalek
 			else:
-				self.make_move(posDalek, new_pos)  # move the dalek
+				self.make_move(pos_dalek, new_pos)  # move the dalek
