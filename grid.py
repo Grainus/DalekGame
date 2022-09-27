@@ -10,7 +10,6 @@
 #   - Logic for the movement of the units
 # ----------------------------------------------------------------------------------------------------------------------#
 from random import randint
-from math import dist
 from models import Doctor, Dalek, Junk, Direction, Ability
 from typing import List, Tuple, Optional, Type, Union
 
@@ -47,12 +46,14 @@ class GameGrid:
                     break
             self.cells[x][y] = Dalek()
 
-    def summon_doctor(self, zap_count: int) -> None:
+    def summon_doctor(self, zap_count: int = 1) -> Doctor:
         """Summon the doctor on the grid"""
         x, y = randint(0, self.height - 1), randint(0, self.width - 1)
         # while isinstance(self.cells[x][y], Dalek) or isinstance(self.cells[x][y], Junk):
         #	x, y = randint(0, self.height - 1), randint(0, self.width - 1)
-        self.cells[x][y] = Doctor(zap_count)
+        doc = Doctor(zap_count)
+        self.cells[x][y] = doc
+        return doc
 
     def find_pos(self, 
                 obj_type: Type[Doctor] | Type[Dalek] | Type[Junk]
