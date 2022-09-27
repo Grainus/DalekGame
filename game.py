@@ -22,7 +22,7 @@ class Game:
         self.score = 0
         self.niveau = 1
 
-        self.doctor = Doctor()
+        self.doctor = Doctor(0)
         self.grid = grid
     
     def start_game(self):
@@ -30,6 +30,7 @@ class Game:
         self.start_wave()
 
     def start_wave(self):
+        self.doctor.zap_count += 1
         self.grid.summon_daleks(5*self.niveau)
         
     def end_wave(self):
