@@ -40,9 +40,9 @@ class Keyboard(EventListener):
             self.state = event.state
             if event.state == State.PLAY:
                 # Check if it's currently the player's turn
-                if self.game.turn.current() == Doctor:
-                    if not self.event_queue.empty():
-                        self.eventman.post(self.event_queue.get())
+                # if self.game.turn.current() == Doctor:
+                if not self.event_queue.empty():
+                    self.eventman.post(self.event_queue.get())
             elif event.state == State.GAMEOVER:
                 self.event_queue = SimpleQueue() # Clear queue
             
