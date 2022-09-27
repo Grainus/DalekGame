@@ -47,9 +47,11 @@ class Game:
         if(self.difficulty == Difficulty.FACILE):
             is_pos_found = False
             pos = []
-            while not(is_pos_found):
+            n=0
+            while not(is_pos_found) or (n < 100):
                 pos = self.grid.new_pos([],'TELEPORT')
                 is_pos_found = True
+                n+=1#pour pas rester stuck dans la while loop
                 for i in range(-2,3):
                     for j in range(-2,3):
                         if isinstance(self.grid.grid[pos[0]+i][pos[1]+j],Dalek):
@@ -58,7 +60,7 @@ class Game:
                     if isinstance(self.grid.grid[pos[0]][pos[1]],Junk):
                         is_pos_found = False
             self.grid.make_move(self.grid.find_doctor(),pos)
-        
+            
         if(self.difficulty == Difficulty.MOYEN):
             is_pos_found = False
             pos = []
