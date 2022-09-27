@@ -28,20 +28,13 @@ class Game:
     def start_game(self):
         self.grid.summon_doctor()
         self.start_wave()
-    
-    def end_game(self):
-        pass
 
     def start_wave(self):
         self.grid.summon_daleks(5*self.niveau)
         
-
     def end_wave(self):
         self.niveau+=1
         #self.start_wave() to be added depending on the working of game engine
-
-    def start_round(self):
-        pass
 
     def end_round(self):
         self.score = self.update_score()
@@ -104,8 +97,6 @@ class Game:
             self.use_tool(event.ability)
         if isinstance(event,BeginEvent):
             self.start_game()
-        if isinstance(event,ExitEvent):
-            self.end_game()
 
         
     
