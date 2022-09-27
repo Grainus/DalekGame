@@ -4,10 +4,6 @@ from models import Doctor, Ability, Junk, Dalek
 from grid import GameGrid
 from enum import Enum
 
-class Turn(Enum):
-    DOCTOR = 0
-    DALEK = 1
-
 class Difficulty(Enum):
     FACILE =0
     MOYEN =1
@@ -25,8 +21,6 @@ class Game:
 
         self.score = 0
         self.niveau = 1
-
-        self.turn= Turn.DOCTOR
 
         self.doctor = Doctor()
         self.grid = grid
@@ -47,7 +41,7 @@ class Game:
         #self.start_wave() to be added depending on the working of game engine
 
     def start_round(self):
-        self.turn=Turn.DOCTOR
+        pass
 
     def end_round(self):
         self.score = self.update_score()
