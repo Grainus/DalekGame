@@ -4,19 +4,26 @@ from __future__ import annotations
 from collections.abc import Sequence
 from enum import Enum
 
-class NotImplementedClass:
+
+# Characters
+
+class Doctor:
+    def __init__(self, zap_count: int):
+        self.zap_count = zap_count
+
+    def can_zap(self) -> bool:
+        return self.zap_count > 0
+
+class Dalek:
     def __init__(self):
-        raise NotImplementedError
+        self.move_count=0
 
-class Doctor(NotImplementedClass):
+class Junk:
     pass
 
-class Dalek(NotImplementedClass):
-    pass
 
-class Junk(NotImplementedClass):
-    pass
 
+# Enums
 
 class Direction(Enum):
     UP = 0
@@ -48,6 +55,9 @@ class State(Enum):
     GAMEOVER = 3
     HIGHSCORE = 4
 
+
+
+# Custom models
 
 class Turn:
     def __init__(self, turns: Sequence[type]):
