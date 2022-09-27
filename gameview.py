@@ -24,7 +24,6 @@ class GameView(EventListener):
         height  = int(termsize.columns * 1/55)
         return between_x, between_y, width, height
 
-    @staticmethod
     def afficher_header(self, niveau, score):
         diff = self.game.difficulty.name.title()
         posx = get_terminal_size().columns 
@@ -78,6 +77,6 @@ class GameView(EventListener):
         score = self.game.score
         nb_de_zap = self.game.doctor.zap_count
         system('cls')
-        GameView.afficher_header(niveau, score)
+        self.afficher_header(niveau, score)
         GameView.afficher_les_cases(grid, row, col)
         GameView.afficher_footer(difficulte, nb_de_zap)
