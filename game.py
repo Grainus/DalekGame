@@ -1,9 +1,8 @@
 
 from eventmanager import BeginEvent, Event,ExitEvent,EventManager, PlayerAbilityEvent
-from models import Doctor, Ability, Junk
+from models import Doctor, Ability, Junk, Dalek
 from grid import GameGrid
 from enum import Enum
-from dalek import Dalek
 
 class Turn(Enum):
     DOCTOR = 0
@@ -33,6 +32,7 @@ class Game:
         self.grid = grid
     
     def start_game(self):
+        self.grid.summon_doctor()
         self.start_wave()
     
     def end_game(self):
@@ -40,12 +40,10 @@ class Game:
 
     def start_wave(self):
         self.grid.summon_daleks(5*self.niveau)
-        self.grid.summon_doctor()
+        
 
     def end_wave(self):
         self.niveau+=1
-        doc_pos = self.grid.find_doctor()
-        self.grid.grid[doc_pos[0]][doc_pos[1]] = None
         #self.start_wave() to be added depending on the working of game engine
 
     def start_round(self):
@@ -55,7 +53,7 @@ class Game:
         self.score = self.update_score()
 
     def update_score(self)->int:
-        return (5*self.niveau) - (len(self.grid.get_all_daleks()))
+        return ((5*self.niveau) - (len(self.grid.get_all_daleks()))) * 5 #(nombre de daleks initial - nombre de dalek vivant) * 5 points par dalek mort
 
     def check_teleport(self):
         if(self.difficulty == Difficulty.FACILE):
@@ -116,4 +114,5 @@ class Game:
             self.end_game()
 
         
+    
     
