@@ -10,9 +10,7 @@
 #   - Logic for the movement of the units
 # ----------------------------------------------------------------------------------------------------------------------#
 from random import randint
-from dalek import Dalek
-from models import Junk
-from doctor import Doctor
+from models import Junk, Doctor, Dalek
 from typing import Type
 
 # Add isInstance() to the list of types
