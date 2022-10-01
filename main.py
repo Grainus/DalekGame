@@ -13,6 +13,7 @@ import logging
 def main():
     logging.basicConfig(level=logging.DEBUG)
     evman = EventManager()
+    menu = MenuView(evman)
     evman.post(DrawEvent(State.MENU))
     
     while not (input := Keyboard.get_text()) in "123": pass
@@ -26,7 +27,6 @@ def main():
     kbd = Keyboard(evman, game)
     views = (
         GameView(evman, game),
-        MenuView(evman),
         HighScoreView(evman)
     )
     engine = GameEngine(evman)

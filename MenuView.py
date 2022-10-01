@@ -3,6 +3,7 @@ from os import get_terminal_size, system
 
 from eventmanager import EventListener, Event, DrawEvent
 from models import State
+from settings import CELL_REPR
  
 class MenuView(EventListener):
     def notify(self, event: Event):
@@ -28,12 +29,11 @@ class MenuView(EventListener):
 {termsixoffset}Normal: 0
 {termsixoffset}Debug:  1
 
-
-{"C = Case  D = Doctor  X = Dalek  J = Junk".center(termsize)}
-
+{str(CELL_REPR)
+    .replace("'", '')
+    .replace("NoneType", "Empty")
+    [1:-1].center(termsize)}
 
 {"PRESS ENTER TO CONTINUE...".center(termsize)}
 """
         )
-        
-MenuView.afficher_menu()

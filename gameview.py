@@ -3,6 +3,7 @@ from os import get_terminal_size, system
 from game import Game
 from eventmanager import EventManager, EventListener, Event, DrawEvent
 from models import State, Difficulty, Doctor, Dalek, Junk
+from settings import CELL_REPR
 
 class GameView(EventListener):
     def __init__(self, eventmanager: EventManager, game : Game):
@@ -39,14 +40,15 @@ class GameView(EventListener):
         for row in grid.cells: 
             output = "" 
             for cell in row:
-                if isinstance(cell, Doctor):
-                    output += "X" * width + sep
-                elif isinstance(cell, Junk):
-                    output += "J" * width + sep
-                elif isinstance(cell, Dalek):
-                    output += "D" * width + sep
-                else:
-                    output += "C" * width + sep
+                output += CELL_REPR[type(cell).__name__] * width + sep
+                # if isinstance(cell, Doctor):
+                #     output += "X" * width + sep
+                # elif isinstance(cell, Junk):
+                #     output += "J" * width + sep
+                # elif isinstance(cell, Dalek):
+                #     output += "D" * width + sep
+                # else:
+                #     output += "C" * width + sep
                     
             for i in range(height):
                 #Ne pas oublier d'enlever le "  " a la fin des strings quand on affiche le jeu bien centrer ex: "CCCCC  CCCCC  " -> "CCCCC  CCCCC"

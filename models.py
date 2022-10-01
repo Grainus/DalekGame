@@ -3,12 +3,12 @@
 from __future__ import annotations
 from collections.abc import Sequence
 from enum import Enum
-import settings
+from settings import DEFAULT_ZAP
 
 # Characters
 
 class Doctor:
-    def __init__(self, zap_count: int = settings.DEFAULT_ZAP):
+    def __init__(self, zap_count: int = DEFAULT_ZAP):
         self.zap_count = zap_count
 
     def can_zap(self) -> bool:
