@@ -18,7 +18,7 @@ class Game(EventListener):
         self.play_mode = play_mode
 
         self.score = 0
-        self.level = 1
+        self.level = 0
 
         self.doctor = Doctor()
     
@@ -29,28 +29,27 @@ class Game(EventListener):
 
     def start_wave(self):
         self.doctor.zap_count += 1
+        self.level += 1
         self.grid.summon_daleks(5*self.level)
         self.eventman.post(DrawEvent(State.PLAY))
-        
-    def end_wave(self):
-        self.level+=1
-        #self.start_wave() to be added depending on the working of game engine
 
     def start_round(self,dir = None):
         if dir is not None:
             self.grid.request_move(dir)
         self.grid.move_all_daleks()
         self.score = self.update_score()
-        if self.grid.find_doctor() is False:
-            self.eventman.post(ExitEvent)#verify is doctor is dead
-        if self.grid.get_all_daleks() is None:
-            self.end_wave()
+        if not self.grid.find_doctor():
+            self.eventman.post(ExitEvent) # Check if doctor is dead
+        if not self.grid.find_pos(Dalek):
             self.start_wave()
         self.end_round()
 
     def end_round(self):
-        self.score = self.update_score()
         self.eventman.post(DrawEvent(State.PLAY))
+        if not self.grid.find_doctor():
+            self.eventman.post(ExitEvent)
+        else:
+            self.score = self.update_score()
 
     def update_score(self)->int:
         return ((5*self.level) - (len(self.grid.get_all_daleks()))) * 5 #(nombre de daleks initial - nombre de dalek vivant) * 5 points par dalek mort
@@ -93,19 +92,21 @@ class Game(EventListener):
                 
 
     
-    def zap(self,pos):
+    def zap(self, pos):
         if (self.doctor.can_zap()):
-            for i in range(-1,2):
-                for j in range(-1,2):
-                    if not((i == pos[0])and(j==pos[1])):
-                        self.grid.kill_at([pos[0]+i,pos[1]+j])
+            self.doctor.zap_count -= 1
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    killpos = (pos[0]+i, pos[1]+j)
+                    if self.grid.is_inside(killpos) and killpos != pos:
+                        self.grid.kill_at(killpos)
 
     def use_tool(self,ability: Ability):
         if(ability == ability.ZAP):
             self.zap(self.grid.find_doctor())
         if(ability == ability.TELEPORT):
             self.grid.teleport_doctor(self.difficulty)
-        self.end_round()
+        self.start_round()
 
     def notify(self,event: Event):
         super().notify(event)

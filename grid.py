@@ -73,6 +73,9 @@ class GameGrid:
                 if isinstance(self.cells[i][k],obj_type):
                     return (i, k)
         return None
+    
+    def is_inside(self, pos: Pos) -> bool:
+        return 0 <= pos[0] < self.height and 0 <= pos[1] < self.width
 
     def find_doctor(self) -> Pos | None:
         """Find the doctor on the grid using find_pos, shortcut."""
@@ -111,39 +114,49 @@ class GameGrid:
     def validate_move(self,
             pos: Pos, request: Direction | Ability) -> bool:
         """Validate a move requested by the user."""
+        cell = self.cells[pos[0]][pos[1]]
         if request == Direction.UP:
-            if pos[0]:
-                return True
+            return self.is_inside((pos[0] - 1, pos[1]))
+            # if pos[0]:
+            #     return True
         elif request == Direction.UPRIGHT:
-            if pos[0] and pos[1] != self.width - 1:
-                return True
+            return self.is_inside((pos[0] - 1, pos[1] + 1))
+            # if pos[0] and pos[1] != self.width - 1:
+            #     return True
         elif request == Direction.UPLEFT:
-            if pos[0] and pos[1]:
-                return True
+            return self.is_inside((pos[0] - 1, pos[1] - 1))
+            # if pos[0] and pos[1]:
+            #     return True
         elif request == Direction.DOWN:
-            if pos[0] < self.height - 1:
-                return True
+            return self.is_inside((pos[0] + 1, pos[1]))
+            # if pos[0] < self.height - 1:
+            #     return True
         elif request == Direction.DOWNRIGHT:
-            if pos[0] < self.height - 1 and pos[1] < self.width - 1:
-                return True
+            return self.is_inside((pos[0] + 1, pos[1] + 1))
+            # if pos[0] < self.height - 1 and pos[1] < self.width - 1:
+            #     return True
         elif request == Direction.DOWNLEFT:
-            if pos[0] < self.height - 1 and pos[1]:
-                return True
+            return self.is_inside((pos[0] + 1, pos[1] - 1))
+            # if pos[0] < self.height - 1 and pos[1]:
+            #     return True
         elif request == Direction.LEFT:
-            if pos[1]:
-                return True
+            return self.is_inside((pos[0], pos[1] - 1))
+            # if pos[1]:
+            #     return True
         elif request == Direction.RIGHT:
-            if pos[1] < self.width - 1:
-                return True
-        elif request == Ability.TELEPORT:  # Always true if doctor
-            if self.cells[pos[0]][pos[1]] == Doctor:
-                return True
-        elif request == Ability.ZAP:
-            cell = self.cells[pos[0]][pos[1]]
-            if isinstance(cell, Doctor):
-                if cell.can_zap():
-                    cell.zap_count -= 1
-                    return True
+            return self.is_inside((pos[0], pos[1] + 1))
+            # if pos[1] < self.width - 1:
+            #     return True
+        elif request == Direction.NONE:
+            return True
+        # elif request == Ability.TELEPORT:  # Always true if doctor
+        #     if isinstance(cell, Doctor):
+        #         return True
+        # elif request == Ability.ZAP:
+        #     if isinstance(cell, Doctor):
+        #         if cell.can_zap():
+        #             cell.zap_count -= 1
+        #             return True
         return False
 
     def dalek_direction_to_doctor(self, distance: Pos) -> Direction:
@@ -200,6 +213,7 @@ class GameGrid:
                 daleks,
                 key=lambda p: dist(p, pos)
             )
+        return None
     
     def teleport_doctor(self, difficulty: Difficulty) -> None:
         valid_pos = []
@@ -221,7 +235,7 @@ class GameGrid:
 
         if valid_pos:
             pos = choice(valid_pos)
-            self.make_move(self.find_doctor(), pos)
+            self.make_move(self.find_doctor(), pos) # type: ignore
 
     def get_all_daleks(self) -> list[Pos]:
         """Get all the daleks in the grid"""
