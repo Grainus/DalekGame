@@ -28,7 +28,7 @@ class GameView(EventListener):
         diff = self.game.difficulty.name.title()
         posx = get_terminal_size().columns 
         print()
-        print( ("Difficulty: " + diff).center(int(posx*1/3)) +("Niveau: " + niveau).center(int((posx * 1/3))) + ("Score: " + score).center(int(posx*1/3)))
+        print( (f"Difficulty: {diff}").center(int(posx*1/3)) +(f"Niveau: {niveau}").center(int((posx * 1/3))) + (f"Score: {score}").center(int(posx*1/3)))
         print()
 
     @staticmethod
@@ -36,7 +36,7 @@ class GameView(EventListener):
         between_x, between_y, width, height = GameView._get_vars()
         #Boucle pour string des cases, une fois qu'on a la string il faut simplement la print(string) n fois pour faire la heuteur de la case
         sep = " " * between_x
-        for row in grid.grid: 
+        for row in grid.cells: 
             output = "" 
             for cell in row:
                 if isinstance(cell, Doctor):
@@ -65,7 +65,7 @@ class GameView(EventListener):
             
         posx = get_terminal_size().columns 
         print( ("TELEPORTEUR (z) : " + sorte_de_teleporteur).center(int(posx*1/3)) + (" ").center(int(posx*1/3))+ 
-        ("ZAP (x): "+ "["+nb_de_zap+"]").center(int(posx*1/3))+"\n")
+        (f"ZAP (x): [{nb_de_zap}]").center(int(posx*1/3))+"\n")
 
     def show_game_view(self):
         grid = self.game.grid
@@ -78,5 +78,5 @@ class GameView(EventListener):
         nb_de_zap = self.game.doctor.zap_count
         system('cls')
         self.afficher_header(niveau, score)
-        GameView.afficher_les_cases(grid, row, col)
+        GameView.afficher_les_cases(grid)
         GameView.afficher_footer(difficulte, nb_de_zap)
