@@ -12,11 +12,13 @@
 from random import randint
 from models import Doctor, Dalek, Junk, Direction, Ability
 from typing import List, Tuple, Optional, Type, Union
+import settings
 
 Pos = Tuple[int, int]
 
 class GameGrid:
-    def __init__(self, width=8, height=6):
+    def __init__(self, width: int = settings.DEFAULT_WIDTH, 
+            height: int = settings.DEFAULT_HEIGHT):
         self.width = width
         self.height = height
         self.cells: List[List[Optional[Doctor | Dalek | Junk]]] = []

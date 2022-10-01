@@ -3,12 +3,12 @@
 from __future__ import annotations
 from collections.abc import Sequence
 from enum import Enum
-
+import settings
 
 # Characters
 
 class Doctor:
-    def __init__(self, zap_count: int):
+    def __init__(self, zap_count: int = settings.DEFAULT_ZAP):
         self.zap_count = zap_count
 
     def can_zap(self) -> bool:
@@ -46,6 +46,11 @@ class Difficulty(Enum):
     EASY = 0
     MEDIUM = 1
     HARD = 2
+
+
+class PlayMode(Enum):
+    NORMAL = 0
+    DEBUG = 1
 
 
 class State(Enum):

@@ -73,7 +73,7 @@ class GameView(EventListener):
         col = self.game.grid.height
         #les param de Game a renommer
         difficulte = self.game.difficulty
-        niveau = self.game.niveau
+        niveau = self.game.level
         score = self.game.score
         nb_de_zap = self.game.doctor.zap_count
         system('cls')
