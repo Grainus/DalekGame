@@ -27,7 +27,7 @@ class GameEngine(EventListener):
     def run(self) -> None:
         """Starts the main game loop."""
         self.running = True
-        self.state = State.MENU
+        self.state = State.PLAY
         self.eventman.post(BeginEvent())
         logging.info("Starting")
         while self.running:

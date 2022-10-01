@@ -12,18 +12,21 @@ class MenuView(EventListener):
                 
     @staticmethod
     def afficher_menu():
-        system('cls')
+        # system('cls')
         termsize = get_terminal_size().columns
         termsix = termsize * 1/6
         diffoffset = " " * int(termsix + len("Difficulty  "))
+        termsixoffset = " " * int(termsix)
         print(f"""
 {"DALEK GAME".center(termsize)}
 {"Choose your option...".center(termsize)}
-{" " * int(termsix)}Difficulty  1. Easy
+{termsixoffset}Difficulty  1. Easy
 {diffoffset}2. Medium
 {diffoffset}3. Hard
 
-{" " * int(termsix)}Debug mode: (Fin ou 01)
+{"Then choose your playmode...".center(termsize)}
+{termsixoffset}Normal: 0
+{termsixoffset}Debug:  1
 
 
 {"C = Case  D = Doctor  X = Dalek  J = Junk".center(termsize)}

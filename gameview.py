@@ -76,7 +76,7 @@ class GameView(EventListener):
         niveau = self.game.level
         score = self.game.score
         nb_de_zap = self.game.doctor.zap_count
-        system('cls')
+        #system('cls')
         self.afficher_header(niveau, score)
         GameView.afficher_les_cases(grid)
         GameView.afficher_footer(difficulte, nb_de_zap)
