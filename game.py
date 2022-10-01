@@ -1,7 +1,8 @@
 """Main game logic, handles turns and waves."""
 
-from eventmanager import BeginEvent, Event, EventListener,ExitEvent,EventManager, PlayerAbilityEvent
-from models import Doctor, Ability, Junk, Dalek, Difficulty, PlayMode
+from eventmanager import BeginEvent, DrawEvent, Event, EventListener,ExitEvent,EventManager, PlayerAbilityEvent
+from models import Doctor, Ability, Junk, Dalek, \
+    Difficulty, PlayMode, State
 from grid import GameGrid
 from enum import Enum
 
@@ -27,6 +28,7 @@ class Game(EventListener):
     def start_wave(self):
         self.doctor.zap_count += 1
         self.grid.summon_daleks(5*self.level)
+        self.eventman.post(DrawEvent(State.PLAY))
         
     def end_wave(self):
         self.level+=1
