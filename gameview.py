@@ -54,7 +54,7 @@ class GameView(EventListener):
                 #Ne pas oublier d'enlever le "  " a la fin des strings quand on affiche le jeu bien centrer ex: "CCCCC  CCCCC  " -> "CCCCC  CCCCC"
                 # you mean rstrip() ??
                 print(output.center(get_terminal_size().columns - between_x))
-            print('\n' * between_y)  
+            print('\n' * between_y, end='')  
 
     @staticmethod
     def afficher_footer(difficulte, nb_de_zap): 
