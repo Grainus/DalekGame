@@ -9,8 +9,9 @@
 #   - The grid's functions
 #   - Logic for the movement of the units
 # ----------------------------------------------------------------------------------------------------------------------#
-from random import randint
-from models import Doctor, Dalek, Junk, Direction, Ability
+from random import randint, choice
+from math import dist
+from models import Difficulty, Doctor, Dalek, Junk, Direction, Ability
 from typing import Tuple, Type, Generator
 import settings
 
@@ -189,8 +190,38 @@ class GameGrid:
             return (pos[0], pos[1] + 1)
         else:
             return pos
-        #"""elif direction == 'TELEPORT':
+        #elif direction == 'TELEPORT':
         #	return [randint(0, GameGrid.height - 1), randint(0, GameGrid.width - 1)] -> See Aby's code in game instead"""
+    
+    def find_closest_dalek(self, pos: Pos) -> Pos | None:
+        daleks = self.get_all_daleks()
+        if daleks:
+            return min(
+                daleks,
+                key=lambda p: dist(p, pos)
+            )
+    
+    def teleport_doctor(self, difficulty: Difficulty) -> None:
+        valid_pos = []
+        for x, lst in enumerate(self.cells):
+            for y, cell in enumerate(lst):
+                if isinstance(cell, Junk):
+                    continue
+                elif (isinstance(cell, Dalek) 
+                        and difficulty != Difficulty.HARD):
+                    continue
+                else:
+                    pos: Pos = (x, y)
+                    if difficulty == Difficulty.EASY:
+                        closest = self.find_closest_dalek(pos)
+                        if not closest or dist(pos, closest) > 2:
+                            valid_pos.append(pos)
+                    else:
+                        valid_pos.append(pos)
+
+        if valid_pos:
+            pos = choice(valid_pos)
+            self.make_move(self.find_doctor(), pos)
 
     def get_all_daleks(self) -> list[Pos]:
         """Get all the daleks in the grid"""
