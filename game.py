@@ -1,6 +1,8 @@
 """Main game logic, handles turns and waves."""
 
-from eventmanager import BeginEvent, DrawEvent, Event, EventListener,ExitEvent,EventManager, PlayerAbilityEvent
+from eventmanager import Event, EventManager, EventListener, \
+    BeginEvent, ExitEvent, PlayerMoveEvent, PlayerAbilityEvent, \
+    DrawEvent
 from models import Doctor, Ability, Junk, Dalek, \
     Difficulty, PlayMode, State
 from grid import GameGrid
@@ -33,6 +35,19 @@ class Game(EventListener):
     def end_wave(self):
         self.level+=1
         #self.start_wave() to be added depending on the working of game engine
+
+    def start_round(self,dir = None):
+        if dir is not None:
+            self.grid.request_move(dir)
+        self.grid.move_all_daleks()
+        self.score = self.update_score()
+        if self.grid.find_doctor() is False:
+            self.eventman.post(ExitEvent)#verify is doctor is dead
+        if self.grid.get_all_daleks() is None:
+            self.end_wave()
+            self.start_wave()
+        
+        self.eventman.post(DrawEvent(State.PLAY))
 
     def end_round(self):
         self.score = self.update_score()
@@ -93,11 +108,11 @@ class Game(EventListener):
             self.check_teleport()
 
     def notify(self,event: Event):
-        if isinstance(event, PlayerAbilityEvent):
-            self.use_tool(event.ability)
+        super().notify(event)
         if isinstance(event,BeginEvent):
             self.start_game()
-
+        elif isinstance(event, PlayerMoveEvent):
+            self.start_round(event.dir)
+        if isinstance(event, PlayerAbilityEvent):
+            self.use_tool(event.ability)
         
-    
-    

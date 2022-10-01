@@ -72,7 +72,7 @@ class Keyboard(EventListener):
             if self.state == State.PLAY:
                 _inputbyte = getch()
                 _input: int | str
-                if ord(_inputbyte) == 0: # Arrow keys
+                if ord(_inputbyte) in (0, 224): # Arrow keys
                     _input = ord(getch())
                 else:
                     _input = _inputbyte.decode().lower()

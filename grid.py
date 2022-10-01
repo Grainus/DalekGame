@@ -186,17 +186,14 @@ class GameGrid:
         #"""elif direction == 'TELEPORT':
         #	return [randint(0, GameGrid.height - 1), randint(0, GameGrid.width - 1)] -> See Aby's code in game instead"""
 
-    def get_all_daleks(self) -> list[Pos] | None:
+    def get_all_daleks(self) -> list[Pos]:
         """Get all the daleks in the grid"""
         daleks = []
         for i, row in enumerate(self.cells):
             for j, cell in enumerate(row):
                 if isinstance(cell, Dalek):
                     daleks.append((i, j))
-        if daleks:
-            return daleks
-        else:
-            return None
+        return daleks
 
     def move_all_daleks(self) -> None:
         """Move all the daleks on the grid"""
