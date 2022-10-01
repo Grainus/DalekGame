@@ -11,25 +11,31 @@
 # ----------------------------------------------------------------------------------------------------------------------#
 from random import randint
 from models import Doctor, Dalek, Junk, Direction, Ability
-from typing import List, Tuple, Optional, Type, Union
+from typing import Tuple, Type, Generator
 import settings
 
 Pos = Tuple[int, int]
+CellType = Doctor | Dalek | Junk | None
 
 class GameGrid:
     def __init__(self, width: int = settings.DEFAULT_WIDTH, 
             height: int = settings.DEFAULT_HEIGHT):
         self.width = width
         self.height = height
-        self.cells: List[List[Optional[Doctor | Dalek | Junk]]] = []
+        self.cells: list[list[CellType]] = []
         self.turn = 0
         self.create_grid()
 
     def create_grid(self) -> None:
         self.cells = [
-            [None for _ in range(self.width)] # type: ignore
+            [None for _ in range(self.width)]
                 for _ in range(self.height)
         ]
+
+    def flatten(self) -> Generator[CellType, None, None]:
+        for lst in self.cells:
+            for cell in lst:
+                yield cell
 
     def summon_daleks(self, dalek_count: int) -> None:
         """Summon the daleks on the grid, \
@@ -37,11 +43,11 @@ class GameGrid:
 
             If there are not enough empty spaces, fill the grid instead.
         """
-        if (max_ := sum(1 for c in self.cells if not c)) < dalek_count:
+        if (max_ := sum(1 for c in self.flatten() if not c)) < dalek_count:
             dalek_count = max_
 
+        simplerand = lambda val: randint(0, val - 1)
         for _ in range(dalek_count):
-            simplerand = lambda val: randint(0, val - 1)
             while True: # do ... while
                 x, y = simplerand(self.height), simplerand(self.width)
                 if self.cells[x][y] is None:

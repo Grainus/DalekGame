@@ -56,7 +56,7 @@ class Game(EventListener):
         return ((5*self.level) - (len(self.grid.get_all_daleks()))) * 5 #(nombre de daleks initial - nombre de dalek vivant) * 5 points par dalek mort
 
     def check_teleport(self):
-        if(self.difficulty == Difficulty.FACILE):
+        if(self.difficulty == Difficulty.EASY):
             is_pos_found = False
             pos = []
             n=0
@@ -73,17 +73,17 @@ class Game(EventListener):
                         is_pos_found = False
             self.grid.make_move(self.grid.find_doctor(),pos)
             
-        if(self.difficulty == Difficulty.MOYEN):
+        if(self.difficulty == Difficulty.MEDIUM):
             is_pos_found = False
             pos = []
             while not (is_pos_found):
                 pos = self.grid.new_pos([],'TELEPORT')
-                if not isinstance(self.grid.grid[pos[0]][pos[1]],Junk):
+                if not isinstance(self.grid.cells[pos[0]][pos[1]],Junk):
                     if not isinstance(self.grid.grid[pos[0]][pos[1]],Dalek):
                         is_pos_found = True
             self.grid.make_move(self.grid.find_doctor(),pos)
 
-        if(self.difficulty == Difficulty.DIFFICILE):
+        if(self.difficulty == Difficulty.HARD):
             is_pos_found = False
             pos = []
             while not (is_pos_found):
