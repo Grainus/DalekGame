@@ -6,12 +6,12 @@ from game_engine import GameEngine
 from game import Game
 from models import Difficulty, PlayMode, State
 from gameview import GameView
-from MenuView import MenuView
+from menuview import MenuView
 from highscoreview import HighScoreView
 import logging
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.WARNING)
     evman = EventManager()
     menu = MenuView(evman)
     evman.post(DrawEvent(State.MENU))
