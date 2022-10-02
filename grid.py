@@ -1,31 +1,30 @@
-# ----------------------------------------------------------------------------------------------------------------------#
+# ---------------------------------------------------------------------#
 # Written by : Christopher Perreault
+# Updated by : Grainus
 # Date : 2022-09-25
-# Description : This is the main file for the game's grid logic. It will create the grid, do the unit's movements, etc.
-# Version : 0.4.0
+# Updated: 2022-10-01
+# Description : This is the main file for the game's grid logic. 
+#               It creates the grid, do the unit's movements, etc.
+# Version : 0.5.0
 # Contains :
 #   - The grid class
 #   - The grid's methods
 #   - The grid's functions
 #   - Logic for the movement of the units
-# ----------------------------------------------------------------------------------------------------------------------#
+# ---------------------------------------------------------------------#
+
 from random import randint, choice
 from math import dist
 from models import Difficulty, Doctor, Dalek, Junk, Direction, Ability
-from typing import Tuple, Type, Generator
+from typing import Type, Generator
 import settings
 
-Pos = Tuple[int, int]
+Pos = tuple[int, int]
 CellType = Doctor | Dalek | Junk | None
 
-# DEBUGGING
-from models import State
-from eventmanager import DrawEvent
-
 class GameGrid:
-    def __init__(self, eventman, width: int = settings.DEFAULT_WIDTH, 
+    def __init__(self, width: int = settings.DEFAULT_WIDTH, 
             height: int = settings.DEFAULT_HEIGHT):
-        self.eventman = eventman
         self.width = width
         self.height = height
         self.cells: list[list[CellType]] = []
@@ -63,11 +62,9 @@ class GameGrid:
                     break
             self.cells[x][y] = Dalek()
 
-    def summon_doctor(self, zap_count: int = 1) -> Doctor:
+    def summon_doctor(self, zap_count: int = settings.DEFAULT_ZAP) -> Doctor:
         """Summon the doctor on the grid"""
         x, y = randint(0, self.height - 1), randint(0, self.width - 1)
-        # while isinstance(self.cells[x][y], Dalek) or isinstance(self.cells[x][y], Junk):
-        #	x, y = randint(0, self.height - 1), randint(0, self.width - 1)
         doc = Doctor(zap_count)
         self.cells[x][y] = doc
         return doc
@@ -121,50 +118,6 @@ class GameGrid:
     def validate_move(self, pos: Pos, request: Direction) -> bool:
         """Validate a move requested by the user."""
         return self.is_inside(self.new_pos(pos, request))
-        # cell = self.cells[pos[0]][pos[1]]
-        # if request == Direction.UP:
-        #     return self.is_inside((pos[0] - 1, pos[1]))
-        #     # if pos[0]:
-        #     #     return True
-        # elif request == Direction.UPRIGHT:
-        #     return self.is_inside((pos[0] - 1, pos[1] + 1))
-        #     # if pos[0] and pos[1] != self.width - 1:
-        #     #     return True
-        # elif request == Direction.UPLEFT:
-        #     return self.is_inside((pos[0] - 1, pos[1] - 1))
-        #     # if pos[0] and pos[1]:
-        #     #     return True
-        # elif request == Direction.DOWN:
-        #     return self.is_inside((pos[0] + 1, pos[1]))
-        #     # if pos[0] < self.height - 1:
-        #     #     return True
-        # elif request == Direction.DOWNRIGHT:
-        #     return self.is_inside((pos[0] + 1, pos[1] + 1))
-        #     # if pos[0] < self.height - 1 and pos[1] < self.width - 1:
-        #     #     return True
-        # elif request == Direction.DOWNLEFT:
-        #     return self.is_inside((pos[0] + 1, pos[1] - 1))
-        #     # if pos[0] < self.height - 1 and pos[1]:
-        #     #     return True
-        # elif request == Direction.LEFT:
-        #     return self.is_inside((pos[0], pos[1] - 1))
-        #     # if pos[1]:
-        #     #     return True
-        # elif request == Direction.RIGHT:
-        #     return self.is_inside((pos[0], pos[1] + 1))
-        #     # if pos[1] < self.width - 1:
-        #     #     return True
-        # elif request == Direction.NONE:
-        #     return True
-        # elif request == Ability.TELEPORT:  # Always true if doctor
-        #     if isinstance(cell, Doctor):
-        #         return True
-        # elif request == Ability.ZAP:
-        #     if isinstance(cell, Doctor):
-        #         if cell.can_zap():
-        #             cell.zap_count -= 1
-        #             return True
-        return False
 
     def dalek_direction_to_doctor(self, distance: Pos) -> Direction:
         """Get the direction to the doctor from the distance between \
@@ -210,8 +163,6 @@ class GameGrid:
             return (pos[0], pos[1] + 1)
         else:
             return pos
-        #elif direction == 'TELEPORT':
-        #	return [randint(0, GameGrid.height - 1), randint(0, GameGrid.width - 1)] -> See Aby's code in game instead"""
     
     def find_closest_dalek(self, pos: Pos) -> Pos | None:
         daleks = self.get_all_daleks()
@@ -267,8 +218,6 @@ class GameGrid:
                 if isinstance(cell, Dalek) \
                         and cell.move_count < self.turn:
                     self.move_dalek(posdoctor, dalek)
-                
-                    self.eventman.post(DrawEvent(State.PLAY)) # FOR DEBUGGING
 
     def move_dalek(self, pos_doctor: Pos, pos_dalek: Pos) -> None:
         # move the dalek on the grid
@@ -280,7 +229,7 @@ class GameGrid:
         if self.validate_move(pos_dalek, direction):
             new_pos = self.new_pos(pos_dalek, direction)
             cell = self.cell_at(new_pos)
-            if isinstance(cell, Dalek):  # Not done, waiting for Abys code
+            if isinstance(cell, Dalek):
                 if cell.move_count < self.turn:
                     self.move_dalek(pos_doctor, new_pos)
                 else:
@@ -290,5 +239,4 @@ class GameGrid:
                 self.kill_at(pos_dalek)
             else:
                 self.make_move(pos_dalek, new_pos)
-                # Main fix for double movements
                 self.cell_at(new_pos).move_count = self.turn # type: ignore

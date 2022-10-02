@@ -3,10 +3,8 @@
 from eventmanager import Event, EventManager, EventListener, \
     BeginEvent, ExitEvent, PlayerMoveEvent, PlayerAbilityEvent, \
     DrawEvent
-from models import Doctor, Ability, Junk, Dalek, \
-    Difficulty, PlayMode, State
+from models import Doctor, Ability, Dalek, Difficulty, PlayMode, State
 from grid import GameGrid
-from enum import Enum
 
 
 class Game(EventListener):
@@ -23,7 +21,7 @@ class Game(EventListener):
         self.doctor = Doctor()
     
     def start_game(self):
-        self.grid = GameGrid(self.eventman)
+        self.grid = GameGrid()
         self.grid.summon_doctor()
         self.start_wave()
 
@@ -56,45 +54,6 @@ class Game(EventListener):
         cumm_points = 5 * ((beaten + 1) * beaten // 2)
         killed_now = 5 * self.level - len(self.grid.get_all_daleks())
         return cumm_points + killed_now
-        #return ((5*self.level) - (len(self.grid.get_all_daleks()))) * 5 #(nombre de daleks initial - nombre de dalek vivant) * 5 points par dalek mort
-
-    # def check_teleport(self):
-    #     if(self.difficulty == Difficulty.EASY):
-    #         is_pos_found = False
-    #         pos = []
-    #         n=0
-    #         while not(is_pos_found) or (n < 100):
-    #             pos = self.grid.new_pos([],'TELEPORT')
-    #             is_pos_found = True
-    #             n+=1#pour pas rester stuck dans la while loop
-    #             for i in range(-2,3):
-    #                 for j in range(-2,3):
-    #                     if isinstance(self.grid.grid[pos[0]+i][pos[1]+j],Dalek):
-    #                         is_pos_found = False
-    #             if (is_pos_found):
-    #                 if isinstance(self.grid.grid[pos[0]][pos[1]],Junk):
-    #                     is_pos_found = False
-    #         self.grid.make_move(self.grid.find_doctor(),pos)
-            
-    #     if(self.difficulty == Difficulty.MEDIUM):
-    #         pos = ()
-    #         while True:
-    #             pos = self.grid.new_pos([],'TELEPORT')
-    #             if not isinstance(self.grid.cells[pos[0]][pos[1]],Junk):
-    #                 if not isinstance(self.grid.grid[pos[0]][pos[1]],Dalek):
-    #                     break
-    #         self.grid.make_move(self.grid.find_doctor(),pos)
-
-    #     if(self.difficulty == Difficulty.HARD):
-    #         is_pos_found = False
-    #         pos = []
-    #         while not (is_pos_found):
-    #             pos = self.grid.new_pos([],'TELEPORT')
-    #             if not isinstance(self.grid.grid[pos[0]][pos[1]],Junk):
-    #                 is_pos_found = True
-    #         self.grid.make_move(self.grid.find_doctor(),pos)
-                
-
     
     def zap(self, pos):
         if (self.doctor.can_zap()):
@@ -120,4 +79,3 @@ class Game(EventListener):
             self.start_round(event.dir)
         elif isinstance(event, PlayerAbilityEvent):
             self.use_tool(event.ability)
-        
