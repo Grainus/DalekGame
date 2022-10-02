@@ -23,7 +23,7 @@ class Game(EventListener):
         self.doctor = Doctor()
     
     def start_game(self):
-        self.grid = GameGrid()
+        self.grid = GameGrid(self.eventman)
         self.grid.summon_doctor()
         self.start_wave()
 
@@ -51,8 +51,12 @@ class Game(EventListener):
         else:
             self.score = self.update_score()
 
-    def update_score(self)->int:
-        return ((5*self.level) - (len(self.grid.get_all_daleks()))) * 5 #(nombre de daleks initial - nombre de dalek vivant) * 5 points par dalek mort
+    def update_score(self) -> int:
+        beaten = self.level - 1
+        cumm_points = 5 * ((beaten + 1) * beaten // 2)
+        killed_now = 5 * self.level - len(self.grid.get_all_daleks())
+        return cumm_points + killed_now
+        #return ((5*self.level) - (len(self.grid.get_all_daleks()))) * 5 #(nombre de daleks initial - nombre de dalek vivant) * 5 points par dalek mort
 
     # def check_teleport(self):
     #     if(self.difficulty == Difficulty.EASY):

@@ -18,9 +18,14 @@ import settings
 Pos = Tuple[int, int]
 CellType = Doctor | Dalek | Junk | None
 
+# DEBUGGING
+from models import State
+from eventmanager import DrawEvent
+
 class GameGrid:
-    def __init__(self, width: int = settings.DEFAULT_WIDTH, 
+    def __init__(self, eventman, width: int = settings.DEFAULT_WIDTH, 
             height: int = settings.DEFAULT_HEIGHT):
+        self.eventman = eventman
         self.width = width
         self.height = height
         self.cells: list[list[CellType]] = []
@@ -37,6 +42,9 @@ class GameGrid:
         for lst in self.cells:
             for cell in lst:
                 yield cell
+
+    def cell_at(self, pos: Pos) -> CellType:
+        return self.cells[pos[0]][pos[1]]
 
     def summon_daleks(self, dalek_count: int) -> None:
         """Summon the daleks on the grid, \
@@ -92,7 +100,7 @@ class GameGrid:
 
     def make_move(self, _from: Pos, to: Pos) -> None:
         """Move the object from the move_from position to the move_to position"""
-        self.cells[to[0]][to[1]] = self.cells[_from[0]][_from[1]]
+        self.cells[to[0]][to[1]] = self.cell_at(_from)
         self.cells[_from[0]][_from[1]] = None
 
     def request_move(self, move: Direction | Ability) -> bool:
@@ -105,50 +113,50 @@ class GameGrid:
         pos = self.find_doctor()
         if pos is not None and self.validate_move(pos, move):
             newPos = self.new_pos(pos, move)
-            if self.cells[newPos[0]][newPos[1]] is None \
+            if self.cell_at(newPos) is None \
                     or move == Direction.NONE:
                 self.make_move(pos, newPos)
                 return True
         return False
 
-    def validate_move(self,
-            pos: Pos, request: Direction | Ability) -> bool:
+    def validate_move(self, pos: Pos, request: Direction) -> bool:
         """Validate a move requested by the user."""
-        cell = self.cells[pos[0]][pos[1]]
-        if request == Direction.UP:
-            return self.is_inside((pos[0] - 1, pos[1]))
-            # if pos[0]:
-            #     return True
-        elif request == Direction.UPRIGHT:
-            return self.is_inside((pos[0] - 1, pos[1] + 1))
-            # if pos[0] and pos[1] != self.width - 1:
-            #     return True
-        elif request == Direction.UPLEFT:
-            return self.is_inside((pos[0] - 1, pos[1] - 1))
-            # if pos[0] and pos[1]:
-            #     return True
-        elif request == Direction.DOWN:
-            return self.is_inside((pos[0] + 1, pos[1]))
-            # if pos[0] < self.height - 1:
-            #     return True
-        elif request == Direction.DOWNRIGHT:
-            return self.is_inside((pos[0] + 1, pos[1] + 1))
-            # if pos[0] < self.height - 1 and pos[1] < self.width - 1:
-            #     return True
-        elif request == Direction.DOWNLEFT:
-            return self.is_inside((pos[0] + 1, pos[1] - 1))
-            # if pos[0] < self.height - 1 and pos[1]:
-            #     return True
-        elif request == Direction.LEFT:
-            return self.is_inside((pos[0], pos[1] - 1))
-            # if pos[1]:
-            #     return True
-        elif request == Direction.RIGHT:
-            return self.is_inside((pos[0], pos[1] + 1))
-            # if pos[1] < self.width - 1:
-            #     return True
-        elif request == Direction.NONE:
-            return True
+        return self.is_inside(self.new_pos(pos, request))
+        # cell = self.cells[pos[0]][pos[1]]
+        # if request == Direction.UP:
+        #     return self.is_inside((pos[0] - 1, pos[1]))
+        #     # if pos[0]:
+        #     #     return True
+        # elif request == Direction.UPRIGHT:
+        #     return self.is_inside((pos[0] - 1, pos[1] + 1))
+        #     # if pos[0] and pos[1] != self.width - 1:
+        #     #     return True
+        # elif request == Direction.UPLEFT:
+        #     return self.is_inside((pos[0] - 1, pos[1] - 1))
+        #     # if pos[0] and pos[1]:
+        #     #     return True
+        # elif request == Direction.DOWN:
+        #     return self.is_inside((pos[0] + 1, pos[1]))
+        #     # if pos[0] < self.height - 1:
+        #     #     return True
+        # elif request == Direction.DOWNRIGHT:
+        #     return self.is_inside((pos[0] + 1, pos[1] + 1))
+        #     # if pos[0] < self.height - 1 and pos[1] < self.width - 1:
+        #     #     return True
+        # elif request == Direction.DOWNLEFT:
+        #     return self.is_inside((pos[0] + 1, pos[1] - 1))
+        #     # if pos[0] < self.height - 1 and pos[1]:
+        #     #     return True
+        # elif request == Direction.LEFT:
+        #     return self.is_inside((pos[0], pos[1] - 1))
+        #     # if pos[1]:
+        #     #     return True
+        # elif request == Direction.RIGHT:
+        #     return self.is_inside((pos[0], pos[1] + 1))
+        #     # if pos[1] < self.width - 1:
+        #     #     return True
+        # elif request == Direction.NONE:
+        #     return True
         # elif request == Ability.TELEPORT:  # Always true if doctor
         #     if isinstance(cell, Doctor):
         #         return True
@@ -252,17 +260,16 @@ class GameGrid:
         daleks = self.get_all_daleks()
         if daleks and posdoctor:
             daleks.sort(
-                key=lambda x: 
-                    abs(x[0] - posdoctor[0]) # type: ignore
-                    + abs(x[1] - posdoctor[1]) # type: ignore
+                key=lambda p: dist(p, posdoctor) # type: ignore
             )
-            # sort the daleks by distance to the doctor (Trouver en ligne)
             self.turn += 1
             for dalek in daleks:
-                cell = self.cells[dalek[0]][dalek[1]]
+                cell = self.cell_at(dalek)
                 if isinstance(cell, Dalek) \
                         and cell.move_count < self.turn:
                     self.move_dalek(posdoctor, dalek)
+                
+                    self.eventman.post(DrawEvent(State.PLAY)) # FOR DEBUGGING
 
     def move_dalek(self, pos_doctor: Pos, pos_dalek: Pos) -> None:
         # move the dalek on the grid
@@ -273,14 +280,16 @@ class GameGrid:
         direction = self.dalek_direction_to_doctor(distance)
         if self.validate_move(pos_dalek, direction):
             new_pos = self.new_pos(pos_dalek, direction)
-            cell = self.cells[new_pos[0]][new_pos[1]]
+            cell = self.cell_at(new_pos)
             if isinstance(cell, Dalek):  # Not done, waiting for Abys code
                 if cell.move_count < self.turn:
                     self.move_dalek(pos_doctor, new_pos)
                 else:
                     self.kill_at(pos_dalek)
                     self.junk_at(new_pos)
-            elif isinstance(self.cells[new_pos[0]][new_pos[1]], Junk):
+            elif isinstance(cell, Junk):
                 self.kill_at(pos_dalek)
             else:
                 self.make_move(pos_dalek, new_pos)
+                # Main fix for double movements
+                self.cell_at(new_pos).move_count = self.turn # type: ignore
