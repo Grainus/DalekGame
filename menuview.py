@@ -13,7 +13,7 @@ class MenuView(EventListener):
                 
     @staticmethod
     def afficher_menu():
-        # system('cls')
+        system('cls')
         termsize = get_terminal_size().columns
         termsix = termsize * 1/6
         diffoffset = " " * int(termsix + len("Difficulty  "))

@@ -2,7 +2,7 @@ from os import get_terminal_size, system
 
 from game import Game
 from eventmanager import EventManager, EventListener, Event, DrawEvent
-from models import State, Difficulty, Doctor, Dalek, Junk
+from models import State, Difficulty
 from settings import CELL_REPR
 
 class GameView(EventListener):
@@ -41,19 +41,9 @@ class GameView(EventListener):
             output = "" 
             for cell in row:
                 output += CELL_REPR[type(cell).__name__] * width + sep
-                # if isinstance(cell, Doctor):
-                #     output += "X" * width + sep
-                # elif isinstance(cell, Junk):
-                #     output += "J" * width + sep
-                # elif isinstance(cell, Dalek):
-                #     output += "D" * width + sep
-                # else:
-                #     output += "C" * width + sep
                     
-            for i in range(height):
-                #Ne pas oublier d'enlever le "  " a la fin des strings quand on affiche le jeu bien centrer ex: "CCCCC  CCCCC  " -> "CCCCC  CCCCC"
-                # you mean rstrip() ??
-                print(output.center(get_terminal_size().columns - between_x))
+            for _ in range(height):
+                print(output.rstrip().center(get_terminal_size().columns))
             print('\n' * between_y, end='')  
 
     @staticmethod
@@ -78,7 +68,7 @@ class GameView(EventListener):
         niveau = self.game.level
         score = self.game.score
         nb_de_zap = self.game.doctor.zap_count
-        #system('cls')
+        system('cls')
         self.afficher_header(niveau, score)
         GameView.afficher_les_cases(grid)
         GameView.afficher_footer(difficulte, nb_de_zap)
