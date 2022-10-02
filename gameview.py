@@ -1,9 +1,19 @@
 from os import get_terminal_size, system
 
+# Enable virtual terminal processing
+import ctypes
+
+kernel32 = ctypes.windll.kernel32
+kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+
+import re
 from game import Game
 from eventmanager import EventManager, EventListener, Event, DrawEvent
 from models import State, Difficulty
-from settings import CELL_REPR
+from settings import CELL_CHAR, CELL_COLOR
+
+def color(code: int, string: str) -> str:
+    return f"\033[{code}m{string}\033[0m"
 
 class GameView(EventListener):
     def __init__(self, eventmanager: EventManager, game : Game):
@@ -16,13 +26,12 @@ class GameView(EventListener):
             if event.state == State.PLAY:
                 self.show_game_view()
     
-    @staticmethod
-    def _get_vars() -> tuple:
+    def _get_vars(self) -> tuple:
         termsize = get_terminal_size()
         between_x = int(termsize.columns * 1/50)
-        between_y = int(termsize.lines * 1/20)
-        width  = int(termsize.columns * 1/30)
-        height  = int(termsize.columns * 1/55)
+        between_y = int(termsize.lines / 50)
+        width  = int(termsize.columns / self.game.grid.width / 3)
+        height  = int(termsize.lines / self.game.grid.height / 1.5)
         return between_x, between_y, width, height
 
     def afficher_header(self, niveau, score):
@@ -32,18 +41,27 @@ class GameView(EventListener):
         print( (f"Difficulty: {diff}").center(int(posx*1/3)) +(f"Niveau: {niveau}").center(int((posx * 1/3))) + (f"Score: {score}").center(int(posx*1/3)))
         print()
 
-    @staticmethod
-    def afficher_les_cases(grid):
-        between_x, between_y, width, height = GameView._get_vars()
+    
+
+    def afficher_les_cases(self, grid):
+        between_x, between_y, width, height = self._get_vars()
         #Boucle pour string des cases, une fois qu'on a la string il faut simplement la print(string) n fois pour faire la heuteur de la case
         sep = " " * between_x
         for row in grid.cells: 
             output = "" 
             for cell in row:
-                output += CELL_REPR[type(cell).__name__] * width + sep
-                    
+                output += CELL_CHAR[type(cell).__name__] * width + sep
+
+            output = output.rstrip()
+            output = output.center(get_terminal_size().columns)
+            for celltype, char in CELL_CHAR.items():
+                output = re.sub(
+                    rf'({char}+)',
+                    lambda x: color(CELL_COLOR[celltype], x.group()),
+                    output
+                )
             for _ in range(height):
-                print(output.rstrip().center(get_terminal_size().columns))
+                print(output)
             print('\n' * between_y, end='')  
 
     @staticmethod
@@ -70,5 +88,5 @@ class GameView(EventListener):
         nb_de_zap = self.game.doctor.zap_count
         system('cls')
         self.afficher_header(niveau, score)
-        GameView.afficher_les_cases(grid)
+        self.afficher_les_cases(grid)
         GameView.afficher_footer(difficulte, nb_de_zap)

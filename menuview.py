@@ -3,7 +3,7 @@ from os import get_terminal_size, system
 
 from eventmanager import EventListener, Event, DrawEvent
 from models import State
-from settings import CELL_REPR
+from settings import CELL_CHAR
  
 class MenuView(EventListener):
     def notify(self, event: Event):
@@ -30,7 +30,7 @@ class MenuView(EventListener):
 {termsixoffset}Run to end:  1
 {termsixoffset}Run and wait:  2
 
-{str(CELL_REPR)
+{str(CELL_CHAR)
     .replace("'", '')
     .replace("NoneType", "Empty")
     [1:-1].center(termsize)}
