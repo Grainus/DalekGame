@@ -113,10 +113,9 @@ class GameGrid:
         pos = self.find_doctor()
         if pos is not None and self.validate_move(pos, move):
             newPos = self.new_pos(pos, move)
-            if self.cell_at(newPos) is None \
-                    or move == Direction.NONE:
+            if self.cell_at(newPos) is None:
                 self.make_move(pos, newPos)
-                return True
+            return True
         return False
 
     def validate_move(self, pos: Pos, request: Direction) -> bool:
