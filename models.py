@@ -50,7 +50,8 @@ class Difficulty(Enum):
 
 class PlayMode(Enum):
     NORMAL = 0
-    DEBUG = 1
+    DEBUG_TOEND = 1
+    DEBUG_WAIT = 2
 
 
 class State(Enum):

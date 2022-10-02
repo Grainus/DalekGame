@@ -19,6 +19,7 @@ class GameEngine(EventListener):
         if isinstance(event, ExitEvent):
             if event.code == 0:
                 self.state = State.GAMEOVER
+                self.running = False
             elif event.code == 1:
                 self.state = State.MENU
             else:

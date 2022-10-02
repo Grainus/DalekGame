@@ -19,7 +19,7 @@ def main():
     while not (input := Keyboard.get_text()) in "123": pass
     diff = Difficulty(int(input) - 1)
 
-    while not (input := Keyboard.get_text()) in "01": pass
+    while not (input := Keyboard.get_text()) in "012": pass
     mode = PlayMode(int(input))
 
     game = Game(evman, difficulty=diff, play_mode=mode)
@@ -31,6 +31,10 @@ def main():
     )
     engine = GameEngine(evman)
     engine.run()
+
+    if mode is PlayMode.NORMAL:
+        # Do game over
+        pass
 
 if __name__ == '__main__':
     main()

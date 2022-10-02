@@ -51,12 +51,14 @@ class PlayerAbilityEvent(Event):
         self.ability = ability
 
 
-class DrawEvent(TickEvent):
+class DrawEvent(Event):
     """Sent when the display needs to be updated.
 
     This allows the game to not draw on every frame \
     if nothing is changing.
     """
+    def __init__(self, state: State):
+        self.state = state
 
 
 class EventManager:

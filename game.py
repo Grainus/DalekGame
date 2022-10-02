@@ -1,8 +1,9 @@
 """Main game logic, handles turns and waves."""
 
+from time import sleep
 from eventmanager import Event, EventManager, EventListener, \
     BeginEvent, ExitEvent, PlayerMoveEvent, PlayerAbilityEvent, \
-    DrawEvent
+    DrawEvent, TickEvent
 from models import Doctor, Ability, Dalek, Difficulty, PlayMode, State
 from grid import GameGrid
 
@@ -34,18 +35,22 @@ class Game(EventListener):
     def start_round(self,dir = None):
         if dir is not None:
             self.grid.request_move(dir)
-        self.grid.move_all_daleks()
-        self.score = self.update_score()
-        if not self.grid.find_doctor():
-            self.eventman.post(ExitEvent) # Check if doctor is dead
-        if not self.grid.find_pos(Dalek):
-            self.start_wave()
+        if not (self.play_mode is PlayMode.DEBUG_WAIT 
+                and self.grid.can_die_next()):
+            self.grid.move_all_daleks()
+            self.score = self.update_score()
+            if not self.grid.find_doctor():
+                self.eventman.post(ExitEvent()) # Check if doctor is dead
+            if not self.grid.find_pos(Dalek):
+                self.start_wave()
         self.end_round()
 
     def end_round(self):
         self.eventman.post(DrawEvent(State.PLAY))
-        if not self.grid.find_doctor():
-            self.eventman.post(ExitEvent)
+        if (not self.grid.find_doctor() 
+                or (self.play_mode is PlayMode.DEBUG_WAIT 
+                    and self.grid.can_die_next())):
+            self.eventman.post(ExitEvent())
         else:
             self.score = self.update_score()
 
@@ -75,7 +80,12 @@ class Game(EventListener):
         super().notify(event)
         if isinstance(event,BeginEvent):
             self.start_game()
-        elif isinstance(event, PlayerMoveEvent):
-            self.start_round(event.dir)
-        elif isinstance(event, PlayerAbilityEvent):
-            self.use_tool(event.ability)
+        if self.play_mode is PlayMode.NORMAL:
+            if isinstance(event, PlayerMoveEvent):
+                self.start_round(event.dir)
+            elif isinstance(event, PlayerAbilityEvent):
+                self.use_tool(event.ability)
+        else:
+            if isinstance(event, TickEvent):
+                sleep(2) # Blocking call :/
+                self.start_round()

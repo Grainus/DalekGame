@@ -85,6 +85,16 @@ class GameGrid:
     def find_doctor(self) -> Pos | None:
         """Find the doctor on the grid using find_pos, shortcut."""
         return self.find_pos(Doctor)
+    
+    def can_die_next(self) -> bool:
+        """Return if a dalek is in position to kill the doctor next turn
+        if he doesn't move.
+        """
+        docpos = self.find_doctor()
+        return dist(
+            docpos, # type: ignore
+            self.find_closest_dalek(docpos) # type: ignore
+        ) <= 1.5
 
     def junk_at(self, pos: Pos) -> None:
         """Converts the selected cell to junk, no matter what is on it.

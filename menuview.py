@@ -27,7 +27,8 @@ class MenuView(EventListener):
 
 {"Then choose your playmode...".center(termsize)}
 {termsixoffset}Normal: 0
-{termsixoffset}Debug:  1
+{termsixoffset}Run to end:  1
+{termsixoffset}Run and wait:  2
 
 {str(CELL_REPR)
     .replace("'", '')

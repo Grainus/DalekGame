@@ -28,7 +28,7 @@ class Keyboard(EventListener):
         super().__init__(eventmanager)
         self.event_queue: SimpleQueue = SimpleQueue()
         self.game = game
-        self.state: State
+        self.state = State.MENU
         self.threaded = True
         self.daemon = True
         
